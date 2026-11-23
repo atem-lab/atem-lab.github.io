@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATEM</title>
-<meta name="description" content="ATEM: North Star, and Granat, the context layer for AI.">
+<meta name="description" content="ATEM: North Star, and Orrery, the context layer for AI.">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
@@ -12,9 +12,11 @@
   /* JetBrains Mono and Inter (SIL OFL 1.1, fonts/LICENSE-*.txt), self-hosted, North Star's two faces. */
   @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
   @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+  /* Major Mono Display (SIL OFL 1.1, fonts/LICENSE-MajorMonoDisplay.txt): Orrery's name. */
+  @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
   :root {
     --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16);
-    --cyan: #2de2e6; --magenta: #ff3d9a; --granat: #e8264f;
+    --cyan: #2de2e6; --magenta: #ff3d9a; --orrery: #e8264f;
     --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
     --sans: 'Inter', system-ui, sans-serif;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -25,7 +27,7 @@
   canvas.field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
   /* A lab's index: the products are the page, in rows as big as a title. Pointing at one turns the whole field to its
-     colour (North Star cyan, Granat pomegranate) and opens its row. The name, for now, plain mono at the top left. */
+     colour (North Star cyan, Orrery red) and opens its row. The name, for now, plain mono at the top left. */
   .page { position: relative; z-index: 1; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; padding: 24px; }
   header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   h1 { margin: 0; font: 500 clamp(38px, 3.8vw, 72px)/1 var(--mono); letter-spacing: -0.02em; color: var(--strong); }
@@ -52,7 +54,7 @@
   .lamp { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px currentColor; }
   .item[data-live] .state { color: var(--cyan); }
   .item[data-live] .lamp { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
-  .item[data-soon] .state { color: var(--granat); }
+  .item[data-soon] .state { color: var(--orrery); }
   .item.open .title { color: var(--tone); transform: translateX(16px); }
   /* North Star's name exactly as its own landing sets it (Landing.module.css .title): JetBrains Mono, regular,
      tracking -0.045em, line height 1. */
@@ -101,12 +103,12 @@
   /* The legal pages, quiet at the top right, across from the name. */
   .legal { display: flex; gap: 16px; font: 400 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
 
-  /* Granat: a thin mono for everything in its section (North Star keeps Inter, in its own only); its name pomegranate
-     and out of focus until you come close, then sharp and bright. */
+  /* Orrery: a thin mono for everything in its section (North Star keeps Inter, in its own only); its name in Major Mono
+     Display, red, and out of focus until you come close, then sharp and bright. */
   .g, .g .well, .g .button, .g .note, .g .inner p { font-family: var(--mono); }
   .g .inner p { font-weight: 300; font-size: 15px; letter-spacing: 0.01em; }
   .g .well, .g .button { font-size: 13px; }
-  .g .title { font: 300 clamp(48px, 10vw, 168px)/0.92 var(--mono); letter-spacing: -0.02em; color: #b81d40; filter: blur(clamp(6px, 0.8vw, 12px)); opacity: 0.9; }
+  .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); text-transform: lowercase; color: #b81d40; filter: blur(clamp(6px, 0.8vw, 12px)); opacity: 0.9; }
   .g.open .title { color: #ff3358; filter: blur(0); opacity: 1; }
 
   @media (max-width: 760px) {
@@ -135,9 +137,9 @@
           <a class="button" href="/north-star/" style="--accent:var(--cyan)">try the demo →</a>
         </div></div></div>
       </section>
-      <section class="item g" data-soon data-tint="#e8264f" style="--tone:var(--granat)">
+      <section class="item g" data-soon data-tint="#e8264f" style="--tone:var(--orrery)">
         <button class="head" type="button" aria-expanded="false">
-          <span class="num">02</span><span class="title">Granat</span><span class="state"><span class="lamp"></span>coming soon</span>
+          <span class="num">02</span><span class="title">Orrery</span><span class="state"><span class="lamp"></span>coming soon</span>
         </button>
         <div class="more"><div><div class="inner">
           <p>The context layer for AI.</p>
@@ -145,9 +147,9 @@
             <form data-waitlist novalidate>
               <input class="well" type="email" name="email" placeholder="you@example.com" autocomplete="email" aria-label="Your email">
               <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-              <button class="button" type="submit" style="--accent:var(--granat)">join the waitlist</button>
+              <button class="button" type="submit" style="--accent:var(--orrery)">join the waitlist</button>
             </form>
-            <p class="note" data-note role="status">Only to tell you when Granat is ready. <a href="/privacy.html">Privacy</a></p>
+            <p class="note" data-note role="status">Only to tell you when Orrery is ready. <a href="/privacy.html">Privacy</a></p>
           </div>
         </div></div></div>
       </section>
@@ -197,12 +199,12 @@
         const res = await fetch(ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, product: 'granat', website: form.website.value }),
+          body: JSON.stringify({ email, product: 'orrery', website: form.website.value }),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
         form.reset();
-        say("You're on the list. We'll write when Granat is ready.", 'ok');
+        say("You're on the list. We'll write when Orrery is ready.", 'ok');
       } catch (err) {
         say(err.message === 'Failed to fetch' ? "Couldn't reach us. Try again." : err.message, 'error');
       } finally {
