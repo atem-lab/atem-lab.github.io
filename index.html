@@ -65,6 +65,7 @@
   .inner p { margin: 0; max-width: 420px; font-size: 16px; line-height: 1.5; color: var(--fg); }
   .inner form { display: flex; gap: 8px; width: min(420px, 100%); }
   .formwrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .formwrap .note { text-align: right; white-space: nowrap; }
 
   /* North Star's page button (Button md): a white pill, the accent wiping in from the left on hover. */
   .button {
@@ -95,6 +96,10 @@
   .note { min-height: 1.4em; margin: 0; font-size: 12px; color: var(--dim); }
   .note[data-state=ok] { color: var(--cyan); }
   .note[data-state=error] { color: var(--magenta); }
+  .note a, footer a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 3px; }
+  .note a:hover, footer a:hover { color: var(--strong); }
+  /* The legal pages, quiet at the foot. */
+  footer { display: flex; justify-content: flex-end; gap: 16px; padding-top: 16px; font: 400 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
 
   /* Granat: a thin mono for everything in its section (North Star keeps Inter, in its own only); its name pomegranate
      and out of focus until you come close, then sharp and bright. */
@@ -110,6 +115,7 @@
     .head .state { grid-column: 2; }
     .inner { flex-direction: column; align-items: flex-start; padding-left: 48px; }
     .formwrap { align-items: flex-start; width: 100%; }
+    .formwrap .note { text-align: left; white-space: normal; }
   }
 </style>
 </head>
@@ -141,11 +147,12 @@
               <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
               <button class="button" type="submit" style="--accent:var(--granat)">join the waitlist</button>
             </form>
-            <p class="note" data-note role="status">Only to tell you when Granat is ready.</p>
+            <p class="note" data-note role="status">Only to tell you when Granat is ready. <a href="/privacy.html">Privacy</a></p>
           </div>
         </div></div></div>
       </section>
     </div>
+    <footer><a href="/impressum.html">Impressum</a><a href="/privacy.html">Privacy</a></footer>
   </main>
 </div>
 <script src="/backdrop.js"></script>
@@ -179,7 +186,7 @@
     const form = document.querySelector('[data-waitlist]');
     const note = document.querySelector('[data-note]');
     const button = form.querySelector('button');
-    const first = note.textContent;
+    const first = note.innerHTML;
     const say = (text, state) => { note.textContent = text; note.dataset.state = state || ''; };
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -203,7 +210,7 @@
         button.disabled = false;
       }
     });
-    form.email.addEventListener('input', () => { if (note.dataset.state === 'error') say(first); });
+    form.email.addEventListener('input', () => { if (note.dataset.state === 'error') { note.innerHTML = first; note.dataset.state = ''; } });
   })();
 </script>
 </body>
