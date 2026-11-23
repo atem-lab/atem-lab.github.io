@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>atem-lab</title>
+<title>ATEM</title>
+<meta name="description" content="ATEM: North Star, and Granat, the context layer for AI.">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
@@ -24,30 +25,82 @@
     font-style: normal;
     font-display: swap;
   }
-  html, body { height: 100%; margin: 0; background: #000; overflow: hidden; }
-  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-  /* The North Star landing's hero: the name bottom left, its button bottom right on the same line. */
-  .hero {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 32px;
-    padding: 24px 24px 32px;
+  :root {
+    --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff;
+    --cyan: #2de2e6; --magenta: #ff3d9a;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
   }
+  html, body { height: 100%; margin: 0; background: #000; color: var(--fg); font-family: var(--sans); }
+  body { overflow-x: hidden; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  /* The page: the name on top, the products under it, a column on the left. */
+  main {
+    position: relative;
+    z-index: 1;
+    min-height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    padding: 24px 24px 48px;
+  }
+  /* North Star's landing name: mono, display size, tight. */
   h1 {
     margin: 0;
-    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-    font-size: clamp(48px, 10vw, 168px);
+    font-family: var(--mono);
+    font-size: clamp(64px, 14vw, 240px);
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.045em;
-    color: #fff;
+    color: var(--strong);
   }
+  .products {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 440px;
+  }
+  /* The glyphs never run under words (North Star's rule): a black shade feathered at its edge under the column. */
+  .products::before {
+    content: '';
+    position: absolute;
+    inset: -56px -200px -72px -48px;
+    z-index: -1;
+    background: #000;
+    -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent);
+    mask-image: radial-gradient(closest-side, #000 72%, transparent);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    opacity: 0.86;
+  }
+  .product { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  /* `01 ── NORTH STAR`: a numbered line, the number magenta, as North Star names its sections. */
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .kicker b { color: var(--magenta); font-weight: 400; }
+  .kicker i { flex: 1; height: 1px; background: rgba(255, 255, 255, 0.16); }
+  .soon {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 61, 154, 0.14);
+    color: var(--magenta);
+    font-size: 11px;
+  }
+  h2 { margin: 4px 0 0; font-size: 32px; font-weight: 500; letter-spacing: -0.02em; color: var(--strong); }
+  .product p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--fg); }
+  .actions { margin-top: 8px; }
   /* North Star's page button (Button md): a white pill, the accent wiping in from the left on hover. */
   .button {
     position: relative;
@@ -57,42 +110,84 @@
     flex: none;
     height: 36px;
     padding: 0 16px;
+    border: 0;
     border-radius: 999px;
     background: #fff;
     color: #000;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1;
+    font: 500 14px/1 var(--sans);
     text-decoration: none;
+    cursor: pointer;
     isolation: isolate;
     overflow: hidden;
-    transition: color 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 70ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: color 200ms var(--ease), transform 70ms var(--ease);
   }
   .button::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: #ff3d9a;
+    background: var(--magenta);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 400ms var(--ease);
   }
   .button:hover::before, .button:focus-visible::before { transform: scaleX(1); }
   .button:focus-visible { outline: none; }
   .button:active { transform: scale(0.97); }
+  .button:disabled { opacity: 0.5; cursor: default; }
+  .button:disabled::before { display: none; }
+  /* The waitlist: North Star's Field, a round well with a cyan ring from the keyboard, its go beside it. */
+  form { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+  input[type=email] {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--strong);
+    font: 400 14px var(--sans);
+    outline: none;
+    transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
+  }
+  input[type=email]::placeholder { color: var(--dim); }
+  input[type=email]:focus-visible { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+  .trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .note { min-height: 1.5em; margin: 0; font-size: 12px !important; color: var(--dim) !important; }
+  .note[data-state=ok] { color: var(--cyan) !important; }
+  .note[data-state=error] { color: var(--magenta) !important; }
   @media (max-width: 760px) {
-    .hero { flex-direction: column; align-items: flex-start; gap: 24px; padding: 16px; }
+    main { gap: 48px; padding: 16px 16px 40px; }
+    h2 { font-size: 26px; }
   }
 </style>
 </head>
 <body>
 <canvas id="field" aria-hidden="true"></canvas>
-<section class="hero">
-  <h1>atem-lab</h1>
-  <a class="button" href="/north-star/">north star</a>
-</section>
+<main>
+  <h1>ATEM</h1>
+  <div class="products">
+    <section class="product">
+      <div class="kicker"><b>01</b><i></i>North Star</div>
+      <h2>North Star</h2>
+      <p>A visual workspace for working out a startup idea, together: customers, problems, rivals and features on one canvas.</p>
+      <div class="actions"><a class="button" href="/north-star/">try the demo →</a></div>
+    </section>
+    <section class="product">
+      <div class="kicker"><b>02</b><i></i>Granat <span class="soon">coming soon</span></div>
+      <h2>Granat</h2>
+      <p>The context layer for AI.</p>
+      <form id="waitlist" novalidate>
+        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-label="Your email">
+        <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="button" type="submit">join the waitlist</button>
+      </form>
+      <p class="note" id="waitlist-note" role="status">We'll only use it to tell you when Granat is ready.</p>
+    </section>
+  </div>
+</main>
 <script>
 // North Star's backdrop (src/three/AmbientField.tsx + AsciiEffect.ts), on plain WebGL: the flow field is drawn at one
 // texel per 9-device-px cell, then each screen cell prints a glyph from a ramp by the field's weight, in its colour.
@@ -332,6 +427,40 @@ void main() {
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+</script>
+<script>
+// The waitlist (D-429 in North Star's memory bank): the email goes to the joinWaitlist function, which keeps it in Firestore.
+(() => {
+  // Local tries can point it at the emulator: 127.0.0.1/?endpoint=<url>.
+  const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
+  const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/joinWaitlist';
+  const form = document.getElementById('waitlist');
+  const note = document.getElementById('waitlist-note');
+  const button = form.querySelector('button');
+  const say = (text, state) => { note.textContent = text; note.dataset.state = state || ''; };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = form.email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return say("That doesn't look like an email.", 'error');
+    button.disabled = true;
+    say('Adding you…');
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, product: 'granat', website: form.website.value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+      form.reset();
+      say("You're on the list. We'll write when Granat is ready.", 'ok');
+    } catch (err) {
+      say(err.message === 'Failed to fetch' ? "Couldn't reach us. Try again." : err.message, 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
 })();
 </script>
 </body>
