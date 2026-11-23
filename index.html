@@ -9,459 +9,202 @@
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* JetBrains Mono (SIL OFL 1.1, fonts/LICENSE-JetBrainsMono.txt), self-hosted like North Star's. */
-  @font-face {
-    font-family: 'JetBrains Mono';
-    src: url('/fonts/jetbrains-mono.woff2') format('woff2');
-    font-weight: 100 800;
-    font-style: normal;
-    font-display: swap;
-  }
-  /* Inter (SIL OFL 1.1, fonts/LICENSE-Inter.txt), North Star's reading and UI face. */
-  @font-face {
-    font-family: 'Inter';
-    src: url('/fonts/inter.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-  }
+  /* JetBrains Mono and Inter (SIL OFL 1.1, fonts/LICENSE-*.txt), self-hosted, North Star's two faces. */
+  @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
   :root {
-    --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff;
-    --cyan: #2de2e6; --magenta: #ff3d9a;
+    --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16);
+    --cyan: #2de2e6; --magenta: #ff3d9a; --granat: #e8264f;
     --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
     --sans: 'Inter', system-ui, sans-serif;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-move: cubic-bezier(0.33, 1, 0.68, 1);
   }
-  html, body { height: 100%; margin: 0; background: #000; color: var(--fg); font-family: var(--sans); }
+  html, body { margin: 0; min-height: 100%; background: #000; color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
   body { overflow-x: hidden; }
-  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-  /* The page: the name on top, the products under it, a column on the left. */
-  main {
-    position: relative;
-    z-index: 1;
-    min-height: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 64px;
-    padding: 24px 24px 48px;
+  canvas.field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* A lab's index: the products are the page, in rows as big as a title. Pointing at one turns the whole field to its
+     colour (North Star cyan, Granat pomegranate) and opens its row. The name, for now, plain mono at the top left. */
+  .page { position: relative; z-index: 1; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; padding: 24px; }
+  header { display: flex; align-items: center; }
+  h1 { margin: 0; font: 500 clamp(38px, 3.8vw, 72px)/1 var(--mono); letter-spacing: -0.02em; color: var(--strong); }
+  main { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+  .rows { position: relative; }
+  /* The glyphs never run under words: a black shade rising from the foot behind the rows. */
+  .rows::before {
+    content: ''; position: absolute; inset: -96px -24px -24px; z-index: -1; pointer-events: none;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 55%, rgba(0, 0, 0, 0));
   }
-  /* North Star's landing name: mono, display size, tight. */
-  h1 {
-    margin: 0;
-    font-family: var(--mono);
-    font-size: clamp(64px, 14vw, 240px);
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: -0.045em;
-    color: var(--strong);
+  .label { margin: 0 0 12px; font: 400 12px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+  .item { border-top: 1px dashed var(--line); --tone: var(--strong); }
+  .item:last-child { border-bottom: 1px dashed var(--line); }
+  .head {
+    display: grid; grid-template-columns: 56px 1fr auto; align-items: baseline; gap: 16px; width: 100%;
+    padding: 18px 0 14px; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit;
   }
-  .products {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 48px;
-    max-width: 440px;
+  .num { font: 400 13px/1 var(--mono); color: var(--magenta); }
+  .title {
+    display: inline-block; font: 500 clamp(48px, 10vw, 168px)/0.92 var(--sans); letter-spacing: -0.045em; color: var(--strong);
+    transition: color 500ms var(--ease-move), transform 600ms var(--ease-move), filter 700ms var(--ease-move), opacity 700ms var(--ease-move);
   }
-  /* The glyphs never run under words (North Star's rule): a black shade feathered at its edge under the column. */
-  .products::before {
-    content: '';
-    position: absolute;
-    inset: -56px -200px -72px -48px;
-    z-index: -1;
-    background: #000;
-    -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent);
-    mask-image: radial-gradient(closest-side, #000 72%, transparent);
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    opacity: 0.86;
-  }
-  .product { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-  /* `01 ── NORTH STAR`: a numbered line, the number magenta, as North Star names its sections. */
-  .kicker {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--dim);
-  }
-  .kicker b { color: var(--magenta); font-weight: 400; }
-  .kicker i { flex: 1; height: 1px; background: rgba(255, 255, 255, 0.16); }
-  .soon {
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: rgba(255, 61, 154, 0.14);
-    color: var(--magenta);
-    font-size: 11px;
-  }
-  h2 { margin: 4px 0 0; font-size: 32px; font-weight: 500; letter-spacing: -0.02em; color: var(--strong); }
-  .product p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--fg); }
-  .actions { margin-top: 8px; }
+  .state { font: 400 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); display: inline-flex; align-items: center; gap: 8px; }
+  .lamp { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px currentColor; }
+  .item[data-live] .state { color: var(--cyan); }
+  .item[data-live] .lamp { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  .item[data-soon] .state { color: var(--granat); }
+  .item.open .title { color: var(--tone); transform: translateX(16px); }
+  /* North Star's name exactly as its own landing sets it (Landing.module.css .title): JetBrains Mono, regular,
+     tracking -0.045em, line height 1. */
+  .ns .title { font: 400 clamp(48px, 10vw, 168px)/1 var(--mono); letter-spacing: -0.045em; }
+  /* A row opens to its details: 600 ms, eased so the move is seen. */
+  .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 600ms var(--ease-move); }
+  .item.open .more { grid-template-rows: 1fr; }
+  .more > div { overflow: hidden; }
+  .inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 0 0 24px 72px; }
+  .inner p { margin: 0; max-width: 420px; font-size: 16px; line-height: 1.5; color: var(--fg); }
+  .inner form { display: flex; gap: 8px; width: min(420px, 100%); }
+  .formwrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
   /* North Star's page button (Button md): a white pill, the accent wiping in from the left on hover. */
   .button {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    height: 36px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 999px;
-    background: #fff;
-    color: #000;
-    font: 500 14px/1 var(--sans);
-    text-decoration: none;
-    cursor: pointer;
-    isolation: isolate;
-    overflow: hidden;
+    position: relative; display: inline-flex; align-items: center; justify-content: center; flex: none;
+    height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: #fff; color: #000;
+    font: 500 14px/1 var(--sans); text-decoration: none; cursor: pointer; isolation: isolate; overflow: hidden;
     transition: color 200ms var(--ease), transform 70ms var(--ease);
   }
   .button::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--magenta);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 400ms var(--ease);
+    content: ''; position: absolute; inset: 0; z-index: -1; background: var(--accent, var(--magenta));
+    transform: scaleX(0); transform-origin: left; transition: transform 400ms var(--ease);
   }
   .button:hover::before, .button:focus-visible::before { transform: scaleX(1); }
   .button:focus-visible { outline: none; }
   .button:active { transform: scale(0.97); }
   .button:disabled { opacity: 0.5; cursor: default; }
   .button:disabled::before { display: none; }
-  /* The waitlist: North Star's Field, a round well with a cyan ring from the keyboard, its go beside it. */
-  form { display: flex; gap: 8px; width: 100%; margin-top: 8px; }
-  input[type=email] {
-    flex: 1;
-    min-width: 0;
-    height: 36px;
-    box-sizing: border-box;
-    padding: 0 16px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--strong);
-    font: 400 14px var(--sans);
-    outline: none;
+  /* North Star's field: a round well, a cyan ring from the keyboard. */
+  .well {
+    flex: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 16px;
+    border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, 0.05);
+    color: var(--strong); font: 400 14px var(--sans); outline: none;
     transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
   }
-  input[type=email]::placeholder { color: var(--dim); }
-  input[type=email]:focus-visible { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+  .well::placeholder { color: var(--dim); }
+  .well:focus-visible { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
   .trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  .note { min-height: 1.5em; margin: 0; font-size: 12px !important; color: var(--dim) !important; }
-  .note[data-state=ok] { color: var(--cyan) !important; }
-  .note[data-state=error] { color: var(--magenta) !important; }
+  .note { min-height: 1.4em; margin: 0; font-size: 12px; color: var(--dim); }
+  .note[data-state=ok] { color: var(--cyan); }
+  .note[data-state=error] { color: var(--magenta); }
+
+  /* Granat: a thin mono for everything in its section (North Star keeps Inter, in its own only); its name pomegranate
+     and out of focus until you come close, then sharp and bright. */
+  .g, .g .well, .g .button, .g .note, .g .inner p { font-family: var(--mono); }
+  .g .inner p { font-weight: 300; font-size: 15px; letter-spacing: 0.01em; }
+  .g .well, .g .button { font-size: 13px; }
+  .g .title { font: 300 clamp(48px, 10vw, 168px)/0.92 var(--mono); letter-spacing: -0.02em; color: #b81d40; filter: blur(clamp(6px, 0.8vw, 12px)); opacity: 0.9; }
+  .g.open .title { color: #ff3358; filter: blur(0); opacity: 1; }
+
   @media (max-width: 760px) {
-    main { gap: 48px; padding: 16px 16px 40px; }
-    h2 { font-size: 26px; }
+    .page { padding: 16px; }
+    .head { grid-template-columns: 32px 1fr; }
+    .head .state { grid-column: 2; }
+    .inner { flex-direction: column; align-items: flex-start; padding-left: 48px; }
+    .formwrap { align-items: flex-start; width: 100%; }
   }
 </style>
 </head>
 <body>
-<canvas id="field" aria-hidden="true"></canvas>
-<main>
-  <h1>ATEM</h1>
-  <div class="products">
-    <section class="product">
-      <div class="kicker"><b>01</b><i></i>North Star</div>
-      <h2>North Star</h2>
-      <p>A visual workspace for working out a startup idea, together: customers, problems, rivals and features on one canvas.</p>
-      <div class="actions"><a class="button" href="/north-star/">try the demo →</a></div>
-    </section>
-    <section class="product">
-      <div class="kicker"><b>02</b><i></i>Granat <span class="soon">coming soon</span></div>
-      <h2>Granat</h2>
-      <p>The context layer for AI.</p>
-      <form id="waitlist" novalidate>
-        <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-label="Your email">
-        <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button class="button" type="submit">join the waitlist</button>
-      </form>
-      <p class="note" id="waitlist-note" role="status">We'll only use it to tell you when Granat is ready.</p>
-    </section>
-  </div>
-</main>
+<canvas class="field" aria-hidden="true"></canvas>
+<div class="page">
+  <header><h1>ATEM</h1></header>
+  <main>
+    <div class="rows">
+      <p class="label">Our products</p>
+      <section class="item ns" data-live data-tint="#2de2e6" style="--tone:var(--cyan)">
+        <button class="head" type="button" aria-expanded="false">
+          <span class="num">01</span><span class="title">North Star</span><span class="state"><span class="lamp"></span>live</span>
+        </button>
+        <div class="more"><div><div class="inner">
+          <p>Work out a startup idea, together: customers, problems, rivals and features on one canvas you share.</p>
+          <a class="button" href="/north-star/" style="--accent:var(--cyan)">try the demo →</a>
+        </div></div></div>
+      </section>
+      <section class="item g" data-soon data-tint="#e8264f" style="--tone:var(--granat)">
+        <button class="head" type="button" aria-expanded="false">
+          <span class="num">02</span><span class="title">Granat</span><span class="state"><span class="lamp"></span>coming soon</span>
+        </button>
+        <div class="more"><div><div class="inner">
+          <p>The context layer for AI.</p>
+          <div class="formwrap">
+            <form data-waitlist novalidate>
+              <input class="well" type="email" name="email" placeholder="you@example.com" autocomplete="email" aria-label="Your email">
+              <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <button class="button" type="submit" style="--accent:var(--granat)">join the waitlist</button>
+            </form>
+            <p class="note" data-note role="status">Only to tell you when Granat is ready.</p>
+          </div>
+        </div></div></div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="/backdrop.js"></script>
 <script>
-// North Star's backdrop (src/three/AmbientField.tsx + AsciiEffect.ts), on plain WebGL: the flow field is drawn at one
-// texel per 9-device-px cell, then each screen cell prints a glyph from a ramp by the field's weight, in its colour.
-(() => {
-  const CELL = 9;          // device px per cell
-  const FPS = 30;          // the field only moves in steps of this
-  const GAIN = 1.4, SATURATION = 1, INK = 1.4;
-  const RAMP = ' .·:-=+*#%@';
-  const STOPS = ['#2de2e6', '#3d7bff', '#ff3d9a', '#ff3d9a', '#ffd23f', '#2de2e6']; // cyan → blue → magenta → yellow → cyan
+  const field = atemBackdrop(document.querySelector('canvas.field'));
 
-  const canvas = document.getElementById('field');
-  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
-  if (!gl) return;
-
-  const quadVs = `
-attribute vec2 aPos;
-varying vec2 vUv;
-uniform vec2 uUvScale;
-void main() { vUv = (aPos * 0.5 + 0.5) * uUvScale; gl_Position = vec4(aPos, 0.0, 1.0); }`;
-
-  const fieldFs = `
-precision highp float;
-varying vec2 vUv;
-uniform float uTime;
-uniform vec2 uAspect;
-uniform vec3 uStops[6];
-uniform float uInk;
-const float PI = 3.14159265;
-const float LIFE = 9.0;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-float noise(vec2 p) {
-  vec2 i = floor(p), f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
-}
-const mat2 ROT = mat2(0.8, -0.6, 0.6, 0.8);
-float fbm(vec2 p) {
-  float v = 0.0, a = 0.5;
-  for (int i = 0; i < 4; i++) { v += a * noise(p); p = ROT * p * 2.03; a *= 0.5; }
-  return v;
-}
-float generation(vec2 p, vec2 r, float seed, float age) {
-  vec2 dir = normalize(vec2(hash(vec2(seed, 1.3)) - 0.5, hash(vec2(seed, 7.9)) - 0.5) + 1e-3);
-  vec2 off = vec2(seed * 17.31, seed * 9.17) + dir * age * 0.35;
-  vec2 w = ROT * p + (r - 0.5) * 1.8 + off;
-  float strands = fbm(vec2(w.x * 0.7 + age * 0.4, w.y * 8.0));
-  float body = smoothstep(0.4, 0.7, fbm(w * vec2(0.6, 1.8) + 2.0 * r));
-  float shape = smoothstep(0.38, 0.78, strands) * body;
-  float env = smoothstep(0.0, 0.55, age) * (1.0 - smoothstep(1.25, 2.0, age));
-  float swell = 0.55 + 0.75 * sin(PI * clamp(age / 2.0, 0.0, 1.0));
-  return shape * env * swell;
-}
-vec3 ribbon(float x) {
-  x = fract(x) * 5.0;
-  float k = floor(x), f = x - k;
-  vec3 a = k < 0.5 ? uStops[0] : k < 1.5 ? uStops[1] : k < 2.5 ? uStops[2] : k < 3.5 ? uStops[3] : uStops[4];
-  vec3 b = k < 0.5 ? uStops[1] : k < 1.5 ? uStops[2] : k < 2.5 ? uStops[3] : k < 3.5 ? uStops[4] : uStops[5];
-  return mix(a, b, f);
-}
-vec4 flow(vec2 p) {
-  float t = uTime * 0.09;
-  vec2 q = vec2(fbm(p * 1.2 + vec2(0.0, t)), fbm(p * 1.2 + vec2(5.2, -t * 0.8)));
-  vec2 r = vec2(fbm(p * 1.1 + 3.0 * q + vec2(1.7 + t * 0.6, 9.2)), fbm(p * 1.1 + 3.0 * q + vec2(8.3, 2.8 - t * 0.5)));
-  float gen = uTime / LIFE;
-  float g = floor(gen);
-  float ph = fract(gen);
-  float older = generation(p, r, g, ph + 1.0);
-  float younger = generation(p, r, g + 1.0, ph);
-  float lum = clamp(max(older, younger), 0.0, 1.0);
-  vec3 hue = ribbon(0.18 + q.x * 1.1 + r.y * 0.9 + lum * 0.35 - t * 0.25);
-  float whiteOlder = step(hash(vec2(g, 3.7)), 0.3) * step(2.0, g);
-  float whiteYounger = step(hash(vec2(g + 1.0, 3.7)), 0.3) * step(2.0, g + 1.0);
-  float white = (whiteOlder * older + whiteYounger * younger) / (older + younger + 1e-4);
-  white = max(white, smoothstep(0.7, 0.78, fbm(p * 1.6 + r * 2.0 + vec2(7.0, 3.0) + t * 0.3)));
-  hue = mix(hue, vec3(1.0), white);
-  return vec4(hue * (0.6 + 0.4 * lum), lum * mix(1.0, 0.8, white));
-}
-void main() {
-  vec2 p = (vUv - 0.5) * uAspect;
-  vec4 wave = flow(p);
-  float calm = smoothstep(1.0, 0.86, vUv.y);
-  gl_FragColor = vec4(wave.rgb * calm, clamp(wave.a * calm * uInk, 0.0, 1.0));
-}`;
-
-  const asciiFs = `
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D uScene;
-uniform vec2 uGrid;
-uniform vec2 uResolution;
-uniform sampler2D uGlyphs;
-uniform float uCount;
-uniform float uCell;
-uniform float uSaturation;
-uniform float uGain;
-vec3 toSrgb(vec3 c) {
-  c = clamp(c, 0.0, 1.0);
-  return mix(c * 12.92, 1.055 * pow(c, vec3(0.41666)) - 0.055, step(vec3(0.0031308), c));
-}
-void main() {
-  vec2 px = vUv * uResolution;
-  vec2 cell = floor(px / uCell);
-  vec4 texel = texture2D(uScene, (cell + 0.5) / uGrid);
-  vec3 c = texel.rgb;
-  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
-  float idx = floor(clamp(texel.a * uGain, 0.0, 0.999) * uCount);
-  vec2 local = fract(px / uCell);
-  float glyph = texture2D(uGlyphs, vec2((idx + local.x) / uCount, local.y)).r;
-  vec3 col = min(mix(vec3(l), c, uSaturation) * uGain * glyph, vec3(1.0));
-  gl_FragColor = vec4(toSrgb(col), 1.0);
-}`;
-
-  function program(fs) {
-    const p = gl.createProgram();
-    for (const [type, src] of [[gl.VERTEX_SHADER, quadVs], [gl.FRAGMENT_SHADER, fs]]) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
-      gl.attachShader(p, s);
+  // One row open at a time: pointing opens it, a press keeps it open (touch has no pointing), leaving goes back to the
+  // kept one.
+  const items = [...document.querySelectorAll('.item')];
+  let kept = null;
+  const show = (item) => {
+    for (const it of items) {
+      const on = it === item;
+      it.classList.toggle('open', on);
+      it.querySelector('.head').setAttribute('aria-expanded', on);
     }
-    gl.bindAttribLocation(p, 0, 'aPos');
-    gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
-    const u = {};
-    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
-    for (let i = 0; i < n; i++) {
-      const name = gl.getActiveUniform(p, i).name.replace(/\[0\]$/, '');
-      u[name] = gl.getUniformLocation(p, name);
-    }
-    return { p, u };
-  }
-  const field = program(fieldFs);
-  const ascii = program(asciiFs);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(0);
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-  // The accents in linear light, as the field mixes them (three.js's Color does the same).
-  const lin = (v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
-  const stops = new Float32Array(STOPS.flatMap((h) => [1, 3, 5].map((i) => lin(parseInt(h.slice(i, i + 2), 16) / 255))));
-
-  // Glyph atlas: white glyphs on black, one 64 px square each.
-  const atlasCanvas = document.createElement('canvas');
-  const atlas = gl.createTexture();
-  function drawAtlas() {
-    const size = 64;
-    atlasCanvas.width = size * RAMP.length;
-    atlasCanvas.height = size;
-    const ctx = atlasCanvas.getContext('2d');
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, atlasCanvas.width, size);
-    ctx.fillStyle = '#fff';
-    ctx.font = `500 ${size * 0.8}px "JetBrains Mono", monospace`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i < RAMP.length; i++) ctx.fillText(RAMP[i], i * size + size / 2, size / 2 + size * 0.04);
-    gl.bindTexture(gl.TEXTURE_2D, atlas);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlasCanvas);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    dirty = true;
+    field.setTint(item ? item.dataset.tint : null, item ? 0.82 : 0);
+  };
+  for (const it of items) {
+    it.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(it); });
+    it.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !it.contains(document.activeElement)) show(kept); });
+    it.querySelector('.head').addEventListener('click', () => { kept = kept === it ? null : it; show(kept); });
+    it.addEventListener('focusin', () => show(it));
   }
 
-  // The field's target: one texel per cell.
-  const target = gl.createTexture();
-  const fbo = gl.createFramebuffer();
-  let cols = 0, rows = 0, dirty = true;
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
-    const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
-    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; dirty = true; }
-    const c = Math.ceil(w / CELL), r = Math.ceil(h / CELL);
-    if (c !== cols || r !== rows) {
-      cols = c; rows = r;
-      gl.bindTexture(gl.TEXTURE_2D, target);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, cols, rows, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, target, 0);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      dirty = true;
-    }
-  }
-
-  function render(t) {
-    const w = canvas.width, h = canvas.height;
-    // The field, into the cell grid.
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.viewport(0, 0, cols, rows);
-    gl.useProgram(field.p);
-    gl.uniform2f(field.u.uUvScale, (cols * CELL) / w, (rows * CELL) / h);
-    gl.uniform1f(field.u.uTime, t);
-    gl.uniform2f(field.u.uAspect, w / h, 1);
-    gl.uniform3fv(field.u.uStops, stops);
-    gl.uniform1f(field.u.uInk, INK);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    // The glyphs, to the screen.
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, w, h);
-    gl.useProgram(ascii.p);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, target);
-    gl.uniform1i(ascii.u.uScene, 0);
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, atlas);
-    gl.uniform1i(ascii.u.uGlyphs, 1);
-    gl.uniform2f(ascii.u.uUvScale, 1, 1);
-    gl.uniform2f(ascii.u.uGrid, cols, rows);
-    gl.uniform2f(ascii.u.uResolution, w, h);
-    gl.uniform1f(ascii.u.uCount, RAMP.length);
-    gl.uniform1f(ascii.u.uCell, CELL);
-    gl.uniform1f(ascii.u.uSaturation, SATURATION);
-    gl.uniform1f(ascii.u.uGain, GAIN);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }
-
-  drawAtlas();
-  document.fonts && document.fonts.load('500 48px "JetBrains Mono"').then(drawAtlas);
-
-  const start = performance.now();
-  let last = -1;
-  function tick() {
-    resize();
-    const t = Math.floor(((performance.now() - start) / 1000) * FPS) / FPS;
-    if (t !== last || dirty) { last = t; dirty = false; render(t); }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-})();
-</script>
-<script>
-// The waitlist (D-429 in North Star's memory bank): the email goes to the joinWaitlist function, which keeps it in Firestore.
-(() => {
-  // Local tries can point it at the emulator: 127.0.0.1/?endpoint=<url>.
-  const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
-  const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/joinWaitlist';
-  const form = document.getElementById('waitlist');
-  const note = document.getElementById('waitlist-note');
-  const button = form.querySelector('button');
-  const say = (text, state) => { note.textContent = text; note.dataset.state = state || ''; };
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = form.email.value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return say("That doesn't look like an email.", 'error');
-    button.disabled = true;
-    say('Adding you…');
-    try {
-      const res = await fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, product: 'granat', website: form.website.value }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
-      form.reset();
-      say("You're on the list. We'll write when Granat is ready.", 'ok');
-    } catch (err) {
-      say(err.message === 'Failed to fetch' ? "Couldn't reach us. Try again." : err.message, 'error');
-    } finally {
-      button.disabled = false;
-    }
-  });
-})();
+  // The waitlist (D-429 in North Star's memory bank): the email goes to the joinWaitlist function, which keeps it in
+  // Firestore. Local tries can point it elsewhere: 127.0.0.1/?endpoint=<url>.
+  (() => {
+    const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
+    const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/joinWaitlist';
+    const form = document.querySelector('[data-waitlist]');
+    const note = document.querySelector('[data-note]');
+    const button = form.querySelector('button');
+    const first = note.textContent;
+    const say = (text, state) => { note.textContent = text; note.dataset.state = state || ''; };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = form.email.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return say("That doesn't look like an email.", 'error');
+      button.disabled = true;
+      say('Adding you…');
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, product: 'granat', website: form.website.value }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+        form.reset();
+        say("You're on the list. We'll write when Granat is ready.", 'ok');
+      } catch (err) {
+        say(err.message === 'Failed to fetch' ? "Couldn't reach us. Try again." : err.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+    form.email.addEventListener('input', () => { if (note.dataset.state === 'error') say(first); });
+  })();
 </script>
 </body>
 </html>

@@ -1,0 +1,265 @@
+// North Star's backdrop (src/three/AmbientField.tsx + AsciiEffect.ts), on plain WebGL: the flow field is drawn at one
+// texel per 9-device-px cell, then each screen cell prints a glyph from a ramp by the field's weight, in its colour.
+// One knob of its own: a tint, the field leaning to one colour (a product's), eased over ~0.7 s.
+// window.atemBackdrop(canvas) → { setTint(hex | null, amount 0..1) }
+window.atemBackdrop = (canvas) => {
+  const CELL = 9;          // device px per cell
+  const FPS = 30;          // the field only moves in steps of this
+  const GAIN = 1.4, SATURATION = 1, INK = 1.4;
+  const RAMP = ' .·:-=+*#%@';
+  const STOPS = ['#2de2e6', '#3d7bff', '#ff3d9a', '#ff3d9a', '#ffd23f', '#2de2e6']; // cyan → blue → magenta → yellow → cyan
+
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
+  if (!gl) return { setTint() {} };
+
+  const quadVs = `
+attribute vec2 aPos;
+varying vec2 vUv;
+uniform vec2 uUvScale;
+void main() { vUv = (aPos * 0.5 + 0.5) * uUvScale; gl_Position = vec4(aPos, 0.0, 1.0); }`;
+
+  const fieldFs = `
+precision highp float;
+varying vec2 vUv;
+uniform float uTime;
+uniform vec2 uAspect;
+uniform vec3 uStops[6];
+uniform float uInk;
+uniform vec3 uTint;
+uniform float uTintMix;
+const float PI = 3.14159265;
+const float LIFE = 9.0;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+}
+const mat2 ROT = mat2(0.8, -0.6, 0.6, 0.8);
+float fbm(vec2 p) {
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * noise(p); p = ROT * p * 2.03; a *= 0.5; }
+  return v;
+}
+float generation(vec2 p, vec2 r, float seed, float age) {
+  vec2 dir = normalize(vec2(hash(vec2(seed, 1.3)) - 0.5, hash(vec2(seed, 7.9)) - 0.5) + 1e-3);
+  vec2 off = vec2(seed * 17.31, seed * 9.17) + dir * age * 0.35;
+  vec2 w = ROT * p + (r - 0.5) * 1.8 + off;
+  float strands = fbm(vec2(w.x * 0.7 + age * 0.4, w.y * 8.0));
+  float body = smoothstep(0.4, 0.7, fbm(w * vec2(0.6, 1.8) + 2.0 * r));
+  float shape = smoothstep(0.38, 0.78, strands) * body;
+  float env = smoothstep(0.0, 0.55, age) * (1.0 - smoothstep(1.25, 2.0, age));
+  float swell = 0.55 + 0.75 * sin(PI * clamp(age / 2.0, 0.0, 1.0));
+  return shape * env * swell;
+}
+vec3 ribbon(float x) {
+  x = fract(x) * 5.0;
+  float k = floor(x), f = x - k;
+  vec3 a = k < 0.5 ? uStops[0] : k < 1.5 ? uStops[1] : k < 2.5 ? uStops[2] : k < 3.5 ? uStops[3] : uStops[4];
+  vec3 b = k < 0.5 ? uStops[1] : k < 1.5 ? uStops[2] : k < 2.5 ? uStops[3] : k < 3.5 ? uStops[4] : uStops[5];
+  return mix(a, b, f);
+}
+vec4 flow(vec2 p) {
+  float t = uTime * 0.09;
+  vec2 q = vec2(fbm(p * 1.2 + vec2(0.0, t)), fbm(p * 1.2 + vec2(5.2, -t * 0.8)));
+  vec2 r = vec2(fbm(p * 1.1 + 3.0 * q + vec2(1.7 + t * 0.6, 9.2)), fbm(p * 1.1 + 3.0 * q + vec2(8.3, 2.8 - t * 0.5)));
+  float gen = uTime / LIFE;
+  float g = floor(gen);
+  float ph = fract(gen);
+  float older = generation(p, r, g, ph + 1.0);
+  float younger = generation(p, r, g + 1.0, ph);
+  float lum = clamp(max(older, younger), 0.0, 1.0);
+  vec3 hue = ribbon(0.18 + q.x * 1.1 + r.y * 0.9 + lum * 0.35 - t * 0.25);
+  float whiteOlder = step(hash(vec2(g, 3.7)), 0.3) * step(2.0, g);
+  float whiteYounger = step(hash(vec2(g + 1.0, 3.7)), 0.3) * step(2.0, g + 1.0);
+  float white = (whiteOlder * older + whiteYounger * younger) / (older + younger + 1e-4);
+  white = max(white, smoothstep(0.7, 0.78, fbm(p * 1.6 + r * 2.0 + vec2(7.0, 3.0) + t * 0.3)));
+  hue = mix(hue, vec3(1.0), white);
+  hue = mix(hue, uTint, uTintMix);
+  return vec4(hue * (0.6 + 0.4 * lum), lum * mix(1.0, 0.8, white));
+}
+void main() {
+  vec2 p = (vUv - 0.5) * uAspect;
+  vec4 wave = flow(p);
+  float calm = smoothstep(1.0, 0.86, vUv.y);
+  gl_FragColor = vec4(wave.rgb * calm, clamp(wave.a * calm * uInk, 0.0, 1.0));
+}`;
+
+  const asciiFs = `
+precision highp float;
+varying vec2 vUv;
+uniform sampler2D uScene;
+uniform vec2 uGrid;
+uniform vec2 uResolution;
+uniform sampler2D uGlyphs;
+uniform float uCount;
+uniform float uCell;
+uniform float uSaturation;
+uniform float uGain;
+vec3 toSrgb(vec3 c) {
+  c = clamp(c, 0.0, 1.0);
+  return mix(c * 12.92, 1.055 * pow(c, vec3(0.41666)) - 0.055, step(vec3(0.0031308), c));
+}
+void main() {
+  vec2 px = vUv * uResolution;
+  vec2 cell = floor(px / uCell);
+  vec4 texel = texture2D(uScene, (cell + 0.5) / uGrid);
+  vec3 c = texel.rgb;
+  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  float idx = floor(clamp(texel.a * uGain, 0.0, 0.999) * uCount);
+  vec2 local = fract(px / uCell);
+  float glyph = texture2D(uGlyphs, vec2((idx + local.x) / uCount, local.y)).r;
+  vec3 col = min(mix(vec3(l), c, uSaturation) * uGain * glyph, vec3(1.0));
+  gl_FragColor = vec4(toSrgb(col), 1.0);
+}`;
+
+  function program(fs) {
+    const p = gl.createProgram();
+    for (const [type, src] of [[gl.VERTEX_SHADER, quadVs], [gl.FRAGMENT_SHADER, fs]]) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+      gl.attachShader(p, s);
+    }
+    gl.bindAttribLocation(p, 0, 'aPos');
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const name = gl.getActiveUniform(p, i).name.replace(/\[0\]$/, '');
+      u[name] = gl.getUniformLocation(p, name);
+    }
+    return { p, u };
+  }
+  const field = program(fieldFs);
+  const ascii = program(asciiFs);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  // The accents in linear light, as the field mixes them (three.js's Color does the same).
+  const hexLin = (h) => [1, 3, 5].map((i) => lin(parseInt(h.slice(i, i + 2), 16) / 255));
+  const lin = (v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+  const stops = new Float32Array(STOPS.flatMap(hexLin));
+
+  // Glyph atlas: white glyphs on black, one 64 px square each.
+  const atlasCanvas = document.createElement('canvas');
+  const atlas = gl.createTexture();
+  function drawAtlas() {
+    const size = 64;
+    atlasCanvas.width = size * RAMP.length;
+    atlasCanvas.height = size;
+    const ctx = atlasCanvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, atlasCanvas.width, size);
+    ctx.fillStyle = '#fff';
+    ctx.font = `500 ${size * 0.8}px "JetBrains Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < RAMP.length; i++) ctx.fillText(RAMP[i], i * size + size / 2, size / 2 + size * 0.04);
+    gl.bindTexture(gl.TEXTURE_2D, atlas);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlasCanvas);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    dirty = true;
+  }
+
+  // The field's target: one texel per cell.
+  const target = gl.createTexture();
+  const fbo = gl.createFramebuffer();
+  let cols = 0, rows = 0, dirty = true;
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; dirty = true; }
+    const c = Math.ceil(w / CELL), r = Math.ceil(h / CELL);
+    if (c !== cols || r !== rows) {
+      cols = c; rows = r;
+      gl.bindTexture(gl.TEXTURE_2D, target);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, cols, rows, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, target, 0);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      dirty = true;
+    }
+  }
+
+  function render(t) {
+    const w = canvas.width, h = canvas.height;
+    // The field, into the cell grid.
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.viewport(0, 0, cols, rows);
+    gl.useProgram(field.p);
+    gl.uniform2f(field.u.uUvScale, (cols * CELL) / w, (rows * CELL) / h);
+    gl.uniform1f(field.u.uTime, t);
+    gl.uniform2f(field.u.uAspect, w / h, 1);
+    gl.uniform3fv(field.u.uStops, stops);
+    gl.uniform1f(field.u.uInk, INK);
+    gl.uniform3fv(field.u.uTint, tint.rgb);
+    gl.uniform1f(field.u.uTintMix, tint.mix);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    // The glyphs, to the screen.
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, w, h);
+    gl.useProgram(ascii.p);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, target);
+    gl.uniform1i(ascii.u.uScene, 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, atlas);
+    gl.uniform1i(ascii.u.uGlyphs, 1);
+    gl.uniform2f(ascii.u.uUvScale, 1, 1);
+    gl.uniform2f(ascii.u.uGrid, cols, rows);
+    gl.uniform2f(ascii.u.uResolution, w, h);
+    gl.uniform1f(ascii.u.uCount, RAMP.length);
+    gl.uniform1f(ascii.u.uCell, CELL);
+    gl.uniform1f(ascii.u.uSaturation, SATURATION);
+    gl.uniform1f(ascii.u.uGain, GAIN);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  drawAtlas();
+  document.fonts && document.fonts.load('500 48px "JetBrains Mono"').then(drawAtlas);
+
+  // The tint moves toward its target by time (a ~160 ms constant: most of the way in ~0.7 s), so the change is seen.
+  const tint = { rgb: [1, 1, 1], to: [1, 1, 1], mix: 0, target: 0 };
+  let tintAt = performance.now();
+  const start = performance.now();
+  let last = -1;
+  function tick() {
+    resize();
+    const now = performance.now();
+    if (tint.mix !== tint.target || tint.rgb.some((v, i) => v !== tint.to[i])) {
+      const k = 1 - Math.exp(-(now - tintAt) / 160);
+      tint.mix += (tint.target - tint.mix) * k;
+      tint.rgb = tint.rgb.map((v, i) => v + (tint.to[i] - v) * k);
+      if (Math.abs(tint.mix - tint.target) < 0.002) tint.mix = tint.target;
+      if (tint.rgb.every((v, i) => Math.abs(v - tint.to[i]) < 0.002)) tint.rgb = tint.to.slice();
+      dirty = true;
+    }
+    tintAt = now;
+    const t = Math.floor(((performance.now() - start) / 1000) * FPS) / FPS;
+    if (t !== last || dirty) { last = t; dirty = false; render(t); }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  return {
+    setTint(hex, amount) {
+      if (hex) tint.to = hexLin(hex);
+      tint.target = amount;
+    },
+  };
+};
