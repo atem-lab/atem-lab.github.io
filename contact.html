@@ -7,23 +7,28 @@
 <meta name="robots" content="noindex">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#000000">
-<link rel="stylesheet" href="/legal.css">
+<link rel="stylesheet" href="/legal.css?v=2">
 </head>
 <body>
 <div class="page">
   <header><a class="home" href="/">ATEM</a><a class="back" href="/">← back</a></header>
   <h1>Contact</h1>
   <p class="sub">Kontakt · questions, privacy, reporting content</p>
-  <p>Write here for a question, a privacy request (access, correction, deletion) or a report of illegal content in North Star. I answer by email, in English or German. You can also write to <a href="mailto:atahankilic.dev@gmail.com">atahankilic.dev@gmail.com</a>.</p>
+  <p>Questions, privacy requests and reports of illegal content in North Star. I answer by email, in English or German. You can also write to <a href="mailto:atahankilic.dev@gmail.com">atahankilic.dev@gmail.com</a>.</p>
   <form data-contact novalidate>
-    <label>What is it about?
-      <select name="topic"><option value="question">A question</option><option value="privacy">A privacy request</option><option value="report">Report illegal content</option></select></label>
-    <label>Your name <span data-opt>(optional)</span><input name="name" autocomplete="name" maxlength="200"></label>
-    <label>Your email<input type="email" name="email" autocomplete="email" maxlength="320"></label>
+    <fieldset class="topics"><legend>What is it about?</legend>
+      <label><input type="radio" name="topic" value="question" checked><span>A question</span></label>
+      <label><input type="radio" name="topic" value="privacy"><span>Privacy</span></label>
+      <label><input type="radio" name="topic" value="report"><span>Report content</span></label>
+    </fieldset>
+    <div class="pair">
+      <label><span>Your name <small data-opt>optional</small></span><input name="name" autocomplete="name" maxlength="200"></label>
+      <label><span>Your email</span><input type="email" name="email" autocomplete="email" maxlength="320"></label>
+    </div>
     <label data-report hidden>Where is the content? (its address, or the workspace and the piece)<input name="link" maxlength="2000"></label>
     <label><span data-msg>Message</span><textarea name="message" rows="7" maxlength="5000"></textarea></label>
     <label class="check" data-report hidden><input type="checkbox" name="goodFaith"> I believe in good faith that what I report here is accurate and complete.</label>
-    <input class="trap" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input hidden name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <button type="submit">Send</button>
     <p data-note role="status">What you write is sent to my inbox only to answer you. <a href="/privacy.html">Privacy</a></p>
   </form>
@@ -42,7 +47,7 @@
     form.querySelector('[data-msg]').textContent = report ? 'Why do you think it is illegal?' : 'Message';
   };
   show();
-  form.topic.addEventListener('change', show);
+  for (const r of form.querySelectorAll('[name=topic]')) r.addEventListener('change', show);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     button.disabled = true;

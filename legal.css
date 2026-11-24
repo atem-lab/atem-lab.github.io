@@ -26,21 +26,36 @@ a:hover { text-decoration-color: var(--cyan); }
 address { font-style: normal; }
 .foot { margin-top: 64px; padding-top: 16px; border-top: 1px dashed var(--line); font: 400 12px/1.4 var(--mono); color: var(--dim); }
 @media (max-width: 760px) { .page { padding: 16px 16px 64px; } header { margin-bottom: 40px; } }
+h1 + p:not(.sub) { margin-top: 32px; }
 
-/* The contact form and the waitlist's confirmation. */
-form { display: grid; gap: 16px; margin-top: 32px; justify-items: start; }
-label { display: grid; gap: 6px; width: 100%; font-size: 14px; }
-label[hidden] { display: none; }
-input, select, textarea { box-sizing: border-box; width: 100%; padding: 9px 14px; border: 1px solid #767676; border-radius: 12px; background: #0d0d0d; color: var(--strong); font: 400 16px/1.4 var(--sans); }
-textarea { resize: vertical; }
+/* The contact form and the waitlist's confirmation: the home page's wells and its white pill. */
+form { display: grid; gap: 24px; margin-top: 40px; justify-items: start; }
+label { display: grid; gap: 8px; width: 100%; font-size: 14px; }
+label small { margin-left: 6px; font: 400 12px/1 var(--mono); color: var(--dim); }
+[hidden] { display: none !important; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+input, textarea { box-sizing: border-box; width: 100%; height: 44px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; background: rgba(255, 255, 255, 0.05); color: var(--strong); font: 400 16px/1.5 var(--sans); outline: none; transition: border-color 200ms, box-shadow 200ms; }
+textarea { height: auto; min-height: 168px; padding: 12px 16px; border-radius: 20px; resize: vertical; }
+input:focus-visible, textarea:focus-visible { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+/* What it's about: one row of pills, the chosen one filled. */
+.topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.topics legend { padding: 0; margin-bottom: 8px; font-size: 14px; }
+.topics label { position: relative; width: auto; }
+.topics input { position: absolute; inset: 0; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.topics span { display: flex; align-items: center; height: 44px; padding: 0 18px; border: 1px solid rgba(255, 255, 255, 0.42); border-radius: 999px; transition: background 200ms, color 200ms; }
+.topics label:hover span { border-color: var(--strong); }
+.topics input:checked + span { background: var(--cyan); border-color: var(--cyan); color: #000; }
+.topics input:focus-visible + span { outline: 2px solid var(--cyan); outline-offset: 3px; }
 label.check { display: flex; align-items: flex-start; gap: 10px; }
-label.check[hidden] { display: none; }
-label.check input { width: auto; margin: 5px 0 0; accent-color: var(--cyan); }
-button { min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: #fff; color: #000; font: 500 15px/1 var(--sans); cursor: pointer; }
-button:hover { background: var(--cyan); }
+label.check input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--cyan); }
+button { position: relative; min-height: 44px; padding: 0 24px; border: 0; border-radius: 999px; background: #fff; color: #000; font: 500 15px/1 var(--sans); cursor: pointer; isolation: isolate; overflow: hidden; }
+button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1); }
+button:hover::before, button:focus-visible::before { transform: scaleX(1); }
 button:disabled { opacity: 0.5; cursor: default; }
-:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
-.trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-[data-note] { margin: 0; font-size: 14px; color: var(--dim); }
+button:disabled::before { display: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+[data-note] { margin: -8px 0 0; font-size: 14px; color: var(--dim); }
 [data-note][data-state=ok] { color: var(--cyan); }
 [data-note][data-state=error] { color: var(--magenta); }
+@media (max-width: 560px) { .pair { grid-template-columns: 1fr; gap: 24px; } }
+@media (prefers-reduced-motion: reduce) { input, textarea, .topics span, button::before { transition: none; } }
