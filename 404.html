@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · ATEM</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<script>
+  // North Star lived at /north-star/ until 2026-11-24 and is now at its own address: its old links go on to the same place.
+  const old = location.pathname.match(/^\/north-star\/(.+)$/);
+  if (old) location.replace('https://north-star.atem-lab.com/' + old[1].replace(/^\/+/, '') + location.search + location.hash);
+</script>
+<link rel="stylesheet" href="/legal.css">
+</head>
+<body>
+<div class="page">
+  <header><a class="home" href="/">ATEM</a><a class="back" href="/">← back</a></header>
+  <h1>Nothing here</h1>
+  <p>This page doesn't exist. Go to <a href="/">ATEM</a> or <a href="https://north-star.atem-lab.com/">open North Star</a>.</p>
+</div>
+</body>
+</html>
