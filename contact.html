@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact · ATEM</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="/legal.css">
+</head>
+<body>
+<div class="page">
+  <header><a class="home" href="/">ATEM</a><a class="back" href="/">← back</a></header>
+  <h1>Contact</h1>
+  <p class="sub">Kontakt · questions, privacy, reporting content</p>
+  <p>Write here for a question, a privacy request (access, correction, deletion) or a report of illegal content in North Star. I answer by email, in English or German. You can also write to <a href="mailto:atahankilic.dev@gmail.com">atahankilic.dev@gmail.com</a>.</p>
+  <form data-contact novalidate>
+    <label>What is it about?
+      <select name="topic"><option value="question">A question</option><option value="privacy">A privacy request</option><option value="report">Report illegal content</option></select></label>
+    <label>Your name <span data-opt>(optional)</span><input name="name" autocomplete="name" maxlength="200"></label>
+    <label>Your email<input type="email" name="email" autocomplete="email" maxlength="320"></label>
+    <label data-report hidden>Where is the content? (its address, or the workspace and the piece)<input name="link" maxlength="2000"></label>
+    <label><span data-msg>Message</span><textarea name="message" rows="7" maxlength="5000"></textarea></label>
+    <label class="check" data-report hidden><input type="checkbox" name="goodFaith"> I believe in good faith that what I report here is accurate and complete.</label>
+    <input class="trap" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button type="submit">Send</button>
+    <p data-note role="status">What you write is sent to my inbox only to answer you. <a href="/privacy.html">Privacy</a></p>
+  </form>
+  <p class="foot"><a href="/impressum.html">Impressum</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a></p>
+</div>
+<script>
+  const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
+  const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/contact';
+  const form = document.querySelector('[data-contact]'), note = form.querySelector('[data-note]'), button = form.querySelector('button');
+  const asked = new URLSearchParams(location.search).get('topic');
+  if (['question', 'privacy', 'report'].includes(asked)) form.topic.value = asked;
+  const show = () => {
+    const report = form.topic.value === 'report';
+    for (const el of form.querySelectorAll('[data-report]')) el.hidden = !report;
+    form.querySelector('[data-opt]').hidden = report;
+    form.querySelector('[data-msg]').textContent = report ? 'Why do you think it is illegal?' : 'Message';
+  };
+  show();
+  form.topic.addEventListener('change', show);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    button.disabled = true;
+    note.dataset.state = '';
+    note.textContent = 'Sending…';
+    try {
+      const f = form, report = f.topic.value === 'report';
+      const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: f.topic.value, name: f.elements.name.value, email: f.email.value, link: report ? f.link.value : '', message: f.message.value, goodFaith: report && f.goodFaith.checked, website: f.website.value }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+      form.reset();
+      show();
+      note.dataset.state = 'ok';
+      note.textContent = report ? 'Received. I look at it and write to you with the decision.' : 'Sent. I answer by email.';
+    } catch (err) {
+      note.dataset.state = 'error';
+      note.textContent = err instanceof TypeError ? "Couldn't reach us. Try again." : err.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

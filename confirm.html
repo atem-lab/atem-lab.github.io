@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confirm · ATEM</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="/legal.css">
+</head>
+<body>
+<div class="page">
+  <header><a class="home" href="/">ATEM</a><a class="back" href="/">← back</a></header>
+  <h1>Confirm your place</h1>
+  <p>Press the button to join the Orrery waitlist. I then write to you once, when Orrery is ready. You can leave the list at any time with the <a href="/contact.html?topic=privacy">contact form</a>.</p>
+  <form data-confirm><button type="submit">Join the waitlist</button><p data-note role="status"><a href="/privacy.html">Privacy</a></p></form>
+  <p class="foot"><a href="/impressum.html">Impressum</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a></p>
+</div>
+<script>
+  const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
+  const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/confirmWaitlist';
+  const [id, token] = location.hash.slice(1).split('.');
+  const form = document.querySelector('[data-confirm]'), note = form.querySelector('[data-note]'), button = form.querySelector('button');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    button.disabled = true;
+    note.textContent = 'Confirming…';
+    try {
+      const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, token }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+      button.hidden = true;
+      note.dataset.state = 'ok';
+      note.textContent = "You're on the list.";
+      history.replaceState(null, '', location.pathname);
+    } catch (err) {
+      button.disabled = false;
+      note.dataset.state = 'error';
+      note.textContent = err instanceof TypeError ? "Couldn't reach us. Try again." : err.message;
+    }
+  });
+</script>
+</body>
+</html>

@@ -26,3 +26,21 @@ a:hover { text-decoration-color: var(--cyan); }
 address { font-style: normal; }
 .foot { margin-top: 64px; padding-top: 16px; border-top: 1px dashed var(--line); font: 400 12px/1.4 var(--mono); color: var(--dim); }
 @media (max-width: 760px) { .page { padding: 16px 16px 64px; } header { margin-bottom: 40px; } }
+
+/* The contact form and the waitlist's confirmation. */
+form { display: grid; gap: 16px; margin-top: 32px; justify-items: start; }
+label { display: grid; gap: 6px; width: 100%; font-size: 14px; }
+label[hidden] { display: none; }
+input, select, textarea { box-sizing: border-box; width: 100%; padding: 9px 14px; border: 1px solid #767676; border-radius: 12px; background: #0d0d0d; color: var(--strong); font: 400 16px/1.4 var(--sans); }
+textarea { resize: vertical; }
+label.check { display: flex; align-items: flex-start; gap: 10px; }
+label.check[hidden] { display: none; }
+label.check input { width: auto; margin: 5px 0 0; accent-color: var(--cyan); }
+button { min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: #fff; color: #000; font: 500 15px/1 var(--sans); cursor: pointer; }
+button:hover { background: var(--cyan); }
+button:disabled { opacity: 0.5; cursor: default; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+[data-note] { margin: 0; font-size: 14px; color: var(--dim); }
+[data-note][data-state=ok] { color: var(--cyan); }
+[data-note][data-state=error] { color: var(--magenta); }
