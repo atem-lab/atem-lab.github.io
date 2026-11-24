@@ -32,7 +32,9 @@
   header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   h1 { margin: 0; font: 500 clamp(38px, 3.8vw, 72px)/1 var(--mono); letter-spacing: -0.02em; color: var(--strong); }
   main { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
-  .rows { position: relative; }
+  /* The rows' contents sit a little in from the page's edge, on the same edge as the name ATEM's ink (measured below);
+     their lines and the label run to the page's edge. */
+  .rows { position: relative; --inset: 0px; }
   /* The glyphs never run under words: a black shade rising from the foot behind the rows. */
   .rows::before {
     content: ''; position: absolute; inset: -96px -24px -24px; z-index: -1; pointer-events: none;
@@ -42,10 +44,9 @@
   .item { border-top: 1px dashed var(--line); --tone: var(--strong); }
   .item:last-child { border-bottom: 1px dashed var(--line); }
   .head {
-    display: grid; grid-template-columns: 56px 1fr auto; align-items: baseline; gap: 16px; width: 100%;
-    padding: 18px 0 14px; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit;
+    display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 16px; width: 100%;
+    padding: 18px 0 14px var(--inset); background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit;
   }
-  .num { font: 400 13px/1 var(--mono); color: var(--magenta); }
   .title {
     display: inline-block; font: 500 clamp(48px, 10vw, 168px)/0.92 var(--sans); letter-spacing: -0.045em; color: var(--strong);
     transition: color 500ms var(--ease-move), transform 600ms var(--ease-move), filter 700ms var(--ease-move), opacity 700ms var(--ease-move);
@@ -55,7 +56,10 @@
   .item[data-live] .state { color: var(--cyan); }
   .item[data-live] .lamp { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
   .item[data-soon] .state { color: var(--orrery); }
-  .item.open .title { color: var(--tone); transform: translateX(16px); }
+  .item.open .title { color: var(--tone); }
+  /* Each name is pulled left by its first letter's own side space (measured below), so its ink starts where the text
+     under it starts. */
+  .title { margin-left: calc(var(--pull, 0) * -1px); }
   /* North Star's name exactly as its own landing sets it (Landing.module.css .title): JetBrains Mono, regular,
      tracking -0.045em, line height 1. */
   .ns .title { font: 400 clamp(48px, 10vw, 168px)/1 var(--mono); letter-spacing: -0.045em; }
@@ -63,7 +67,7 @@
   .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 600ms var(--ease-move); }
   .item.open .more { grid-template-rows: 1fr; }
   .more > div { overflow: hidden; }
-  .inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 0 0 24px 72px; }
+  .inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 0 0 24px var(--inset); }
   .inner p { margin: 0; max-width: 420px; font-size: 16px; line-height: 1.5; color: var(--fg); }
   .inner form { display: flex; gap: 8px; width: min(420px, 100%); }
   .formwrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
@@ -110,12 +114,19 @@
   .g .well, .g .button { font-size: 13px; }
   .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); text-transform: lowercase; color: #b81d40; filter: blur(clamp(3px, 0.4vw, 6px)); opacity: 0.9; }
   .g.open .title { color: #ff3358; filter: blur(0); opacity: 1; }
+  /* Still being made: the row's bottom line a thin red light that runs from left to right, again and again, like
+     something loading. */
+  .item.g { position: relative; }
+  .item.g::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, #ff3358 40%, #ff3358 60%, transparent) no-repeat;
+    background-size: 40% 100%; animation: loading 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes loading { from { background-position: -60% 0; } to { background-position: 160% 0; } }
 
   @media (max-width: 760px) {
     .page { padding: 16px; }
-    .head { grid-template-columns: 32px 1fr; }
-    .head .state { grid-column: 2; }
-    .inner { flex-direction: column; align-items: flex-start; padding-left: 48px; }
+    .inner { flex-direction: column; align-items: flex-start; }
     .formwrap { align-items: flex-start; width: 100%; }
     .formwrap .note { text-align: left; white-space: normal; }
   }
@@ -130,7 +141,7 @@
       <p class="label">Our products</p>
       <section class="item ns" data-live data-tint="#2de2e6" style="--tone:var(--cyan)">
         <button class="head" type="button" aria-expanded="false">
-          <span class="num">01</span><span class="title">North Star</span><span class="state"><span class="lamp"></span>live</span>
+          <span class="title">North Star</span>
         </button>
         <div class="more"><div><div class="inner">
           <p>Work out a startup idea, together: customers, problems, rivals and features on one canvas you share.</p>
@@ -139,7 +150,7 @@
       </section>
       <section class="item g" data-soon data-tint="#e8264f" style="--tone:var(--orrery)">
         <button class="head" type="button" aria-expanded="false">
-          <span class="num">02</span><span class="title">Orrery</span><span class="state"><span class="lamp"></span>coming soon</span>
+          <span class="title">Orrery</span><span class="state"><span class="lamp"></span>coming soon</span>
         </button>
         <div class="more"><div><div class="inner">
           <p>The context layer for AI.</p>
@@ -159,6 +170,32 @@
 <script src="/backdrop.js"></script>
 <script>
   const field = atemBackdrop(document.querySelector('canvas.field'));
+
+  // Every first letter has its own side space. Draw the first letters on a canvas and find where their ink really starts:
+  // each row's text then starts its ink on ATEM's ink edge, and its name is pulled left to the same edge.
+  const inkLeft = (font, ch) => {
+    const c = document.createElement('canvas'); c.width = 400; c.height = 300;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.font = font; x.textBaseline = 'middle'; x.fillText(ch, 100, 150);
+    const d = x.getImageData(0, 0, 400, 300).data;
+    for (let col = 0; col < 400; col++) for (let row = 0; row < 300; row++) if (d[(row * 400 + col) * 4 + 3] > 40) return col - 100;
+    return 0;
+  };
+  const fontOf = (el) => { const cs = getComputedStyle(el); return `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; };
+  const align = () => {
+    const h1 = document.querySelector('h1');
+    const edge = h1.getBoundingClientRect().left + inkLeft(fontOf(h1), h1.textContent[0]);
+    const rowsLeft = document.querySelector('.rows').getBoundingClientRect().left;
+    for (const t of document.querySelectorAll('.title')) {
+      const item = t.closest('.item'), p = item.querySelector('.inner p');
+      const first = getComputedStyle(t).textTransform === 'lowercase' ? t.textContent[0].toLowerCase() : t.textContent[0];
+      const pInk = inkLeft(fontOf(p), p.textContent.trim()[0]);
+      item.style.setProperty('--inset', `${Math.max(0, edge - rowsLeft - pInk).toFixed(1)}px`);
+      t.style.setProperty('--pull', (inkLeft(fontOf(t), first) - pInk).toFixed(1));
+    }
+  };
+  document.fonts.ready.then(align);
+  addEventListener('resize', align);
 
   // One row open at a time: pointing opens it, a press keeps it open (touch has no pointing), leaving goes back to the
   // kept one.
