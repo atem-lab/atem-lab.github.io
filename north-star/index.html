@@ -12,6 +12,8 @@
 <meta property="og:url" content="https://atem-lab.com/north-star/">
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/name.css">
 <style>
   /* The home page's faces, colours and button (index.html). The clips are North Star's own demo scenes, recorded. */
   @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
@@ -28,9 +30,7 @@
   :focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
 
   .hero { min-height: 100svh; box-sizing: border-box; padding: var(--pad); display: flex; flex-direction: column; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-  .atem { font: 800 clamp(40px, 3.95vw, 75px)/1 var(--sans); letter-spacing: -0.04em; color: var(--strong); text-decoration: none; white-space: nowrap; }
-  .atem svg { width: 0.74em; height: 1em; vertical-align: top; margin: 0 -0.02em 0 0.01em; overflow: visible; }
+  header { margin-top: calc(16px - var(--pad)); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
   .foot { position: relative; margin-top: auto; display: grid; gap: 24px; }
   /* The glyphs never run under words. */
   .foot::before { content: ''; position: absolute; inset: -120px calc(var(--pad) * -1) calc(var(--pad) * -1); z-index: -1; background: linear-gradient(to top, #000 45%, transparent); }
@@ -77,13 +77,12 @@
     .whole { padding-top: 64px; } .whole h2 { margin-bottom: 32px; }
     .body { padding-bottom: 96px; }
   }
-  @media (prefers-reduced-motion: reduce) { .button, .button::before, .pause { transition: none; } }
 </style>
 </head>
 <body>
 <canvas class="field" aria-hidden="true"></canvas>
 <div class="hero">
-  <header><a class="atem" href="/" aria-label="ATEM, home"><span aria-hidden="true">A<svg viewBox="0 0 74 100"><defs><linearGradient id="plus" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="74" y2="86"><stop offset="0" stop-color="#2de2e6"/><stop offset="1" stop-color="#ff3d9a"/></linearGradient></defs><path fill="none" stroke="url(#plus)" stroke-width="15" d="M37 14V70Q37 86 53 86H60M4 47H70"/></svg>EM</span></a></header>
+  <header><a class="name" data-of="ns" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true">North Star</span></a></header>
   <div class="foot">
     <h1>North Star</h1>
     <div class="lead">
@@ -114,8 +113,7 @@
     for (const e of ['pointerleave', 'blur']) b.addEventListener(e, () => field.setTint(null, 0));
   }
 
-  // A clip loads and plays only while it's seen; paused by hand it stays so, and under reduced motion it waits for a press.
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // A clip loads and plays only while it's seen; paused by hand it stays so.
   const seen = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting }) => {
     if (isIntersecting && !v.held) v.play().catch(() => {}); else v.pause();
   }), { threshold: 0.35 });
@@ -126,7 +124,7 @@
       b.dataset.held = on;
       b.setAttribute('aria-label', on ? 'Play the demo' : 'Pause the demo');
     };
-    hold(still);
+    hold(false);
     b.addEventListener('click', () => { hold(!v.held); if (v.held) v.pause(); else v.play().catch(() => {}); });
     seen.observe(v);
   }

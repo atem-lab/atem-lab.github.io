@@ -6,6 +6,8 @@
 <title>ATEM</title>
 <meta name="description" content="ATEM: North Star, and Orrery, the context layer for AI.">
 <meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -14,6 +16,8 @@
   @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
   /* Major Mono Display (SIL OFL 1.1, fonts/LICENSE-MajorMonoDisplay.txt): Orrery's name. */
   @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
+  /* Geist Mono (SIL OFL 1.1, fonts/LICENSE-GeistMono.txt): the name. */
+  @font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono.woff2') format('woff2'); font-weight: 500; font-display: swap; }
   :root {
     --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16);
     --cyan: #2de2e6; --magenta: #ff3d9a; --orrery: #e8264f;
@@ -27,13 +31,21 @@
   canvas.field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
   /* A lab's index: the products are the page, in rows as big as a title. Pointing at one turns the whole field to its
-     colour (North Star cyan, Orrery red) and opens its row. The name, for now, plain mono at the top left. */
-  .page { position: relative; z-index: 1; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; padding: 24px; }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-  /* The name: A+EM. The T is a plus whose foot turns right into a t; its colour runs through the field's own accents
-     (cyan → blue → magenta → yellow), in step with the backdrop's order. */
-  h1 { margin: 0; font: 800 clamp(40px, 3.95vw, 75px)/1 var(--sans); letter-spacing: -0.04em; color: var(--strong); white-space: nowrap; }
-  h1 svg { width: 0.74em; height: 1em; vertical-align: top; margin: 0 -0.02em 0 0.01em; overflow: visible; }
+     colour (North Star cyan, Orrery red) and opens its row. */
+  .page { position: relative; z-index: 1; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; padding: 16px 24px 24px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  /* The name: atem and a slash. An open row writes its product after it, in that product's own face and colour; the
+     slash takes the colour and atem steps back. */
+  h1 { flex: none; margin: 0; display: flex; align-items: baseline; font: 500 clamp(24px, 2.37vw, 45px)/1 'Geist Mono', var(--mono); letter-spacing: -0.04em; color: var(--strong); white-space: nowrap; }
+  .lab { transition: color 120ms; }
+  .slash { position: relative; width: 0.56em; height: 0; }
+  .slash::before { content: ''; position: absolute; left: calc(50% - 0.05em); top: -0.893em; width: 0.1em; height: 1.045em; background: var(--tone, var(--strong)); transform: rotate(16deg); transition: background-color 120ms; }
+  h1[data-of] .lab { color: var(--dim); }
+  h1[data-of=ns] { --tone: var(--cyan); }
+  h1[data-of=g] { --tone: #ff3358; }
+  .of { white-space: pre; color: var(--tone); }
+  h1[data-of=ns] .of { font: 400 1em/1 var(--mono); letter-spacing: -0.045em; }
+  h1[data-of=g] .of { font: 400 0.9em/1 'Major Mono Display', var(--mono); letter-spacing: 0; text-transform: lowercase; }
   main { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
   /* The rows' contents sit a little in from the page's edge, on the same edge as the name ATEM's ink (measured below);
      their lines and the label run to the page's edge. */
@@ -74,7 +86,7 @@
   .inner p { margin: 0; max-width: 420px; font-size: 16px; line-height: 1.5; color: var(--fg); }
   .inner form { display: flex; gap: 8px; width: min(420px, 100%); }
   .formwrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-  .formwrap .note { text-align: right; white-space: nowrap; }
+  .formwrap .note { max-width: 420px; text-align: right; text-wrap: balance; }
 
   /* North Star's page button (Button md): a white pill, the accent wiping in from the left on hover. */
   .button {
@@ -105,7 +117,8 @@
   .note { min-height: 1.4em; margin: 0; font-size: 12px; color: var(--dim); }
   .note[data-state=ok] { color: var(--cyan); }
   .note[data-state=error] { color: var(--magenta); }
-  .note a, .legal a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 3px; }
+  .legal a { color: inherit; text-decoration: none; }
+  .note a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 3px; }
   .note a:hover, .legal a:hover { color: var(--strong); }
   /* The legal pages, quiet at the top right, across from the name. */
   .legal { display: flex; gap: 16px; font: 400 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
@@ -128,7 +141,9 @@
   @keyframes loading { from { background-position: -60% 0; } to { background-position: 160% 0; } }
 
   @media (max-width: 760px) {
-    .legal { flex-wrap: wrap; justify-content: flex-end; gap: 6px 14px; line-height: 1.4; }
+    header { gap: 8px; }
+    /* One under the other: the name grows with a product's, and the links must not move for it. */
+    .legal { flex-direction: column; align-items: flex-end; gap: 6px; line-height: 1.4; }
     .page { padding: 16px; }
     .rows::before { inset: -96px -16px -16px; }
     .inner { flex-direction: column; align-items: flex-start; }
@@ -140,7 +155,7 @@
 <body>
 <canvas class="field" aria-hidden="true"></canvas>
 <div class="page">
-  <header><h1 aria-label="ATEM"><span aria-hidden="true">A<svg viewBox="0 0 74 100"><defs><linearGradient id="plus" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="74" y2="86"><stop offset="0" stop-color="#2de2e6"/><stop offset="1" stop-color="#ff3d9a"/></linearGradient></defs><path fill="none" stroke="url(#plus)" stroke-width="15" d="M37 14V70Q37 86 53 86H60M4 47H70"/></svg>EM</span></h1><nav class="legal" aria-label="Legal"><a href="/impressum.html">Impressum</a><a href="/privacy.html">Privacy</a><a href="/contact.html">Contact</a></nav></header>
+  <header><h1 aria-label="ATEM"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true"></span></h1><nav class="legal" aria-label="Legal"><a href="/impressum.html">Impressum</a><a href="/privacy.html">Privacy</a><a href="/contact.html">Contact</a></nav></header>
   <main>
     <div class="rows">
       <p class="label">Our products</p>
@@ -201,26 +216,27 @@
   };
   document.fonts.ready.then(align);
 
-  // The plus's colour: two stops a little apart on the accents' ribbon, moving slowly (still under reduced motion).
-  (() => {
-    const RIB = ['#2de2e6', '#3d7bff', '#ff3d9a', '#ff3d9a', '#ffd23f', '#2de2e6'].map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
-    const at = (x) => {
-      x = (x - Math.floor(x)) * 5;
-      const k = Math.min(4, Math.floor(x)), f = x - k, a = RIB[k], b = RIB[k + 1];
-      return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * f)).join(',')})`;
-    };
-    const stops = document.querySelectorAll('#plus stop');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t0 = performance.now();
-    const tick = () => {
-      const t = (performance.now() - t0) / 1000;
-      stops[0].setAttribute('stop-color', at(t * 0.05));
-      stops[1].setAttribute('stop-color', at(t * 0.05 + 0.3));
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  })();
   addEventListener('resize', align);
+
+  // The name after the slash: whole within 120 ms, whatever its length; gone at once.
+  const name = (() => {
+    const h1 = document.querySelector('h1'), of = h1.querySelector('.of');
+    let now = null, run = 0;
+    return (item) => {
+      if (item === now) return;
+      now = item;
+      cancelAnimationFrame(run);
+      of.textContent = '';
+      if (!item) return h1.removeAttribute('data-of');
+      h1.dataset.of = item.classList.contains('ns') ? 'ns' : 'g';
+      const text = item.querySelector('.title').textContent, from = performance.now();
+      const step = (t) => {
+        of.textContent = text.slice(0, Math.max(1, Math.ceil(((t - from) / 120) * text.length)));
+        if (of.textContent.length < text.length) run = requestAnimationFrame(step);
+      };
+      run = requestAnimationFrame(step);
+    };
+  })();
 
   // One row open at a time: pointing opens it, a press keeps it open (touch has no pointing), leaving goes back to the
   // kept one.
@@ -232,6 +248,7 @@
       it.classList.toggle('open', on);
       it.querySelector('.head').setAttribute('aria-expanded', on);
     }
+    name(item);
     field.setTint(item ? item.dataset.tint : null, item ? 0.82 : 0);
   };
   for (const it of items) {

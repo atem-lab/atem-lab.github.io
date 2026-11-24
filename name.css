@@ -1,0 +1,10 @@
+/* The name on every page but the home page (which has its own, alive): atem and a slash; on a product's page, the
+   product after it in its own face and colour. */
+@font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+.name { display: inline-flex; align-items: baseline; font: 500 clamp(24px, 2.37vw, 45px)/1 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; letter-spacing: -0.04em; color: #fff; text-decoration: none; white-space: nowrap; }
+.name .slash { position: relative; width: 0.56em; height: 0; }
+.name .slash::before { content: ''; position: absolute; left: calc(50% - 0.05em); top: -0.893em; width: 0.1em; height: 1.045em; background: currentColor; transform: rotate(16deg); }
+.name[data-of=ns] .lab { color: #8a8a8a; transition: color 120ms; }
+.name[data-of=ns]:hover .lab { color: #fff; }
+.name[data-of=ns] .slash, .name[data-of=ns] .of { color: #2de2e6; }
+.name[data-of=ns] .of { font: 400 1em/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: -0.045em; white-space: pre; }

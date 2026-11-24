@@ -11,11 +11,13 @@
   const old = location.pathname.match(/^\/north-star\/(.+)$/);
   if (old) location.replace('https://north-star.atem-lab.com/' + old[1].replace(/^\/+/, '') + location.search + location.hash);
 </script>
-<link rel="stylesheet" href="/legal.css?v=2">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/name.css">
+<link rel="stylesheet" href="/legal.css?v=3">
 </head>
 <body>
 <div class="page">
-  <header><a class="home" href="/">ATEM</a><a class="back" href="/">← back</a></header>
+  <header><a class="name" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span></a><a class="back" href="/">← back</a></header>
   <h1>Nothing here</h1>
   <p>This page doesn't exist. Go to <a href="/">ATEM</a> or <a href="https://north-star.atem-lab.com/">open North Star</a>.</p>
 </div>

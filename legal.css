@@ -9,7 +9,6 @@
 html, body { margin: 0; background: #000; color: var(--fg); font: 400 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
 .page { max-width: 680px; margin: 0 auto; padding: 24px 24px 96px; }
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 64px; }
-.home { font: 500 clamp(28px, 2.6vw, 40px)/1 var(--mono); letter-spacing: -0.02em; color: var(--strong); text-decoration: none; }
 .back { font: 400 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
 .back:hover { color: var(--strong); }
 h1 { margin: 0 0 8px; font: 500 clamp(36px, 5vw, 56px)/1.05 var(--sans); letter-spacing: -0.03em; color: var(--strong); }
@@ -58,4 +57,3 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan); outline-
 [data-note][data-state=ok] { color: var(--cyan); }
 [data-note][data-state=error] { color: var(--magenta); }
 @media (max-width: 560px) { .pair { grid-template-columns: 1fr; gap: 24px; } }
-@media (prefers-reduced-motion: reduce) { input, textarea, .topics span, button::before { transition: none; } }
