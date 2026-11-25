@@ -1,133 +1,267 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>North Star · ATEM</title>
-<meta name="description" content="Work out a startup idea, together: customers, problems, rivals and features on one canvas you share.">
-<meta name="theme-color" content="#000000">
-<link rel="canonical" href="https://atem-lab.com/north-star/">
-<meta property="og:title" content="North Star">
-<meta property="og:description" content="Work out a startup idea, together.">
-<meta property="og:url" content="https://atem-lab.com/north-star/">
-<link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/name.css">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>North Star · ATEM</title>
+<meta name="description" content="Work out a startup idea, together: a canvas, its tasks and conversations, and an agent that knows all of it."><meta name="theme-color" content="#000000"><link rel="canonical" href="https://atem-lab.com/north-star/"><meta property="og:title" content="North Star"><meta property="og:description" content="Work out a startup idea, together."><meta property="og:url" content="https://atem-lab.com/north-star/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/name.css">
+<link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* The home page's faces, colours and button (index.html). The clips are North Star's own demo scenes, recorded. */
-  @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
-  @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
-  :root {
-    color-scheme: dark; --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16); --cyan: #2de2e6; --magenta: #ff3d9a;
-    --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace; --sans: 'Inter', system-ui, sans-serif;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1); --pad: 24px;
-  }
-  ::selection { background: var(--cyan); color: #000; }
-  html, body { margin: 0; background: #000; color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-  canvas.field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero, .body, .end { position: relative; z-index: 1; }
-  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
-
-  .hero { min-height: 100svh; box-sizing: border-box; padding: var(--pad); display: flex; flex-direction: column; }
-  header { margin-top: calc(16px - var(--pad)); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-  .foot { position: relative; margin-top: auto; display: grid; gap: 24px; }
-  /* The glyphs never run under words. */
-  .foot::before { content: ''; position: absolute; inset: -120px calc(var(--pad) * -1) calc(var(--pad) * -1); z-index: -1; background: linear-gradient(to top, #000 45%, transparent); }
-  h1 { margin: 0; font: 400 clamp(48px, 13vw, 232px)/1 var(--mono); letter-spacing: -0.045em; color: var(--strong); white-space: nowrap; margin-left: -0.06em; }
-  .lead { display: flex; align-items: end; justify-content: space-between; gap: 32px; padding-top: 24px; border-top: 1px dashed var(--line); }
-  .lead p { margin: 0; max-width: 24em; font-size: clamp(18px, 1.7vw, 26px); line-height: 1.35; text-wrap: balance; }
-
-  .button {
-    position: relative; display: inline-flex; align-items: center; flex: none; height: 44px; padding: 0 22px; border-radius: 999px;
-    background: #fff; color: #000; font: 500 15px/1 var(--sans); text-decoration: none; isolation: isolate; overflow: hidden; transition: transform 70ms var(--ease);
-  }
-  .button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform 400ms var(--ease); }
-  .button:hover::before, .button:focus-visible::before { transform: scaleX(1); }
-  .button:active { transform: scale(0.97); }
-
-  .body { background: #000; padding: 0 var(--pad) 160px; }
-  .whole { padding: 96px 0 0; }
-  h2 { margin: 0; font: 500 clamp(32px, 3.6vw, 64px)/1.05 var(--sans); letter-spacing: -0.035em; color: var(--strong); text-wrap: balance; }
-  .whole h2 { max-width: 17em; margin-bottom: 48px; font-size: clamp(36px, 5.4vw, 96px); line-height: 1; }
-  .row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); gap: 32px 64px; margin-top: 96px; padding-top: 24px; border-top: 1px dashed var(--line); }
-  .say { display: flex; flex-direction: column; gap: 24px; }
-  .say p { margin: 0; max-width: 27em; font-size: 17px; line-height: 1.55; }
-  .shot { position: relative; margin: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #000; }
-  video { display: block; width: 100%; height: auto; }
-  .pause { position: absolute; right: 8px; bottom: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.7); cursor: pointer; display: grid; place-items: center; opacity: 0; transition: opacity 200ms var(--ease); }
-  .shot:hover .pause, .pause:focus-visible, .pause[data-held=true] { opacity: 1; }
-  @media (hover: none) { .pause { opacity: 0.8; } }
-  .pause:focus-visible { outline-offset: -2px; }
-  .pause span { width: 4px; height: 14px; border: solid #fff; border-width: 0 4px; }
-  .pause[data-held=true] span { width: 0; height: 0; border-color: transparent transparent transparent #fff; border-width: 8px 0 8px 13px; margin-left: 3px; }
-
-  .end { min-height: 80svh; box-sizing: border-box; padding: var(--pad); display: flex; flex-direction: column; justify-content: flex-end; }
-  .end::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(#000, transparent 35%, transparent 45%, #000 90%); }
-  .end .go { display: flex; align-items: end; justify-content: space-between; gap: 32px; }
-  .end h2 { font-size: clamp(40px, 8vw, 96px); line-height: 1; }
-  footer { display: flex; gap: 20px; margin-top: 48px; padding-top: 16px; border-top: 1px dashed var(--line); font: 400 12px/1 var(--mono); letter-spacing: 0.06em; }
-  footer a { color: var(--dim); text-underline-offset: 3px; padding: 6px 0; }
-  footer a:hover { color: var(--strong); }
-
-  @media (max-width: 760px) {
-    :root { --pad: 16px; }
-    .lead, .end .go { flex-direction: column; align-items: flex-start; }
-    .row { grid-template-columns: minmax(0, 1fr); margin-top: 72px; }
-    .whole { padding-top: 64px; } .whole h2 { margin-bottom: 32px; }
-    .body { padding-bottom: 96px; }
-  }
-</style>
-</head>
-<body>
-<canvas class="field" aria-hidden="true"></canvas>
-<div class="hero">
-  <header><a class="name" data-of="ns" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true">North Star</span></a></header>
-  <div class="foot">
-    <h1>North Star</h1>
-    <div class="lead">
-      <p>Work out a startup idea, together: customers, problems, rivals and features on one canvas you share.</p>
-      <a class="button" href="https://north-star.atem-lab.com/">Open North Star</a>
-    </div>
-  </div>
-</div>
-<main class="body">
-  <section class="whole">
-    <h2>Your notes, research and plan are one thing. Keep them in one place.</h2>
-    <figure class="shot"><video src="/north-star/media/canvas-fit.mp4" poster="/north-star/media/canvas-fit.webp" width="1440" height="900" muted loop playsinline preload="none" aria-label="A workspace: planes, a matrix, a table, a deck and a timeline on one canvas, zoomed into and out of."></video><button class="pause" type="button" aria-label="Pause the demo"><span></span></button></figure>
-  </section>
-    <section class="row"><div class="say"><h2>Start with who hurts</h2><p>Put customers, problems and ideas down as cards, then link them: this problem is for them, this idea solves it. Every card shows whether it is still a hypothesis, being tested, or validated.</p></div><figure class="shot"><video src="/north-star/media/kind-plane.mp4" poster="/north-star/media/kind-plane.webp" width="1440" height="900" muted loop playsinline preload="none" aria-label="Cards appear on a plane: a customer, their problem, and an idea linked to it."></video><button class="pause" type="button" aria-label="Pause the demo"><span></span></button></figure></section>
-    <section class="row"><div class="say"><h2>See what rivals leave open</h2><p>Break competitors into their features and set them against yours. Score each cell, say how sure you are, and the gaps show.</p></div><figure class="shot"><video src="/north-star/media/kind-matrix.mp4" poster="/north-star/media/kind-matrix.webp" width="1440" height="900" muted loop playsinline preload="none" aria-label="A matrix of features against competitors fills in, cell by cell."></video><button class="pause" type="button" aria-label="Pause the demo"><span></span></button></figure></section>
-    <section class="row"><div class="say"><h2>Choose what to build first</h2><p>Features sit by effort and impact. North Star suggests an order from impact, confidence and effort, and confidence counts how much of what a feature rests on is validated or being tested.</p></div><figure class="shot"><video src="/north-star/media/priorities.mp4" poster="/north-star/media/priorities.webp" width="1440" height="900" muted loop playsinline preload="none" aria-label="Features on an effort and impact board, then the suggested order beside them."></video><button class="pause" type="button" aria-label="Pause the demo"><span></span></button></figure></section>
-    <section class="row"><div class="say"><h2>Be in the same room</h2><p>See everyone’s cursor, follow a teammate to where they are, comment on anything and hand out tasks. Invite people as owners, editors or viewers.</p></div><figure class="shot"><video src="/north-star/media/follow.mp4" poster="/north-star/media/follow.webp" width="1440" height="900" muted loop playsinline preload="none" aria-label="Following a teammate, Ayla, from the canvas into a plane."></video><button class="pause" type="button" aria-label="Pause the demo"><span></span></button></figure></section>
-</main>
-<section class="end">
-  <div class="go"><h2>Bring an idea.</h2><a class="button" href="https://north-star.atem-lab.com/">Open North Star</a></div>
-  <footer><a href="/">ATEM</a><a href="/impressum">Impressum</a><a href="/privacy">Privacy</a></footer>
-</section>
-<script src="/backdrop.js"></script>
-<script>
-  const field = atemBackdrop(document.querySelector('canvas.field'));
-  for (const b of document.querySelectorAll('.button')) {
-    for (const e of ['pointerenter', 'focus']) b.addEventListener(e, () => field.setTint('#2de2e6', 0.82));
-    for (const e of ['pointerleave', 'blur']) b.addEventListener(e, () => field.setTint(null, 0));
-  }
-
-  // A clip loads and plays only while it's seen; paused by hand it stays so.
-  const seen = new IntersectionObserver((es) => es.forEach(({ target: v, isIntersecting }) => {
-    if (isIntersecting && !v.held) v.play().catch(() => {}); else v.pause();
-  }), { threshold: 0.35 });
-  for (const shot of document.querySelectorAll('.shot')) {
-    const v = shot.querySelector('video'), b = shot.querySelector('.pause');
-    const hold = (on) => {
-      v.held = on;
-      b.dataset.held = on;
-      b.setAttribute('aria-label', on ? 'Play the demo' : 'Pause the demo');
+@font-face{font-family:'JetBrains Mono';src:url('/fonts/jetbrains-mono.woff2') format('woff2');font-weight:100 800;font-display:swap}
+@font-face{font-family:'Inter';src:url('/fonts/inter.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{color-scheme:dark;--cyan:#2de2e6;--magenta:#ff3d9a;--yellow:#ffd23f;--green:#3dff8a;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);--pad:24px;--pc:#1d1e22}
+html,body{margin:0;background:#000;color:#e6e6e6;font-family:var(--sans);-webkit-font-smoothing:antialiased}::selection{background:var(--cyan);color:#000}:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+canvas.field{position:fixed;inset:0;width:100%;height:100%}
+.mast{position:fixed;z-index:20;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:18px var(--pad);pointer-events:none}.mast>*{pointer-events:auto}.mast .button{opacity:0;transform:translateY(-8px);transition:opacity .3s,transform .3s;pointer-events:none}.mast.past .button{opacity:1;transform:none;pointer-events:auto}
+.button{white-space:nowrap;display:inline-flex;align-items:center;position:relative;isolation:isolate;overflow:hidden;height:44px;padding:0 22px;border-radius:99px;background:#fff;color:#000;font:500 15px/1 var(--sans);text-decoration:none}.button::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}.button:hover::before,.button:focus-visible::before{transform:none}.mast .button{height:38px;padding:0 18px;font-size:14px}
+.track{position:relative;z-index:1;height:calc(16.05*115vh + 100svh)}.stage{position:sticky;top:0;height:100svh;overflow:hidden;background:#000}
+.hero{position:absolute;z-index:3;left:0;right:0;bottom:44px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;padding:0 var(--pad)}.hero h1{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.hero p{margin:0;max-width:25em;font-size:clamp(17px,1.35vw,24px);line-height:1.4;text-wrap:balance}
+.zm{position:absolute;inset:0;perspective:1900px;perspective-origin:50% 50%}.sp{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}.a{position:absolute;left:0;top:0;width:max-content;visibility:hidden}
+.cap article{position:absolute;z-index:6;opacity:0;pointer-events:none;max-width:min(33vw,640px)}.cap h2{margin:0;font:500 clamp(34px,4.5vw,92px)/.98 var(--sans);letter-spacing:-.045em;color:#fff;text-wrap:balance}.cap p{margin:1.1em 0 0;font-size:clamp(17px,1.32vw,25px);line-height:1.45;color:#b9b9b9;text-wrap:pretty}
+.cap .l{left:calc(var(--pad) + 3vw);top:50%}.cap .r{right:calc(var(--pad) + 3vw);top:50%}.cap .t{left:50%;top:11.5vh;max-width:min(76vw,1300px);text-align:center}.cap .t p{max-width:34em;margin-inline:auto}.cap .b{left:50%;bottom:6vh;max-width:min(62vw,960px);text-align:center}.cap .b::before{content:'';position:absolute;inset:-90px -40vw -20vh;z-index:-1;background:linear-gradient(transparent,#000 34%)}.cap .c{left:50%;bottom:8vh;max-width:min(62vw,900px);text-align:center}.cap .c::before{content:'';position:absolute;inset:-70px -120px;z-index:-1;background:radial-gradient(closest-side,#000 45%,transparent)}.cap .c h2,.cap .x h2{font-size:clamp(40px,6vw,120px)}.cap .x{left:calc(var(--pad) + 3vw);top:12.5vh;max-width:44vw}
+/* pieces, at their full size */
+.card{box-sizing:border-box;width:600px;height:290px;padding:26px 32px;border-radius:34px;display:flex;flex-direction:column;background:color-mix(in srgb,var(--t) 17%,var(--pc));box-shadow:0 50px 90px -30px #000,inset 0 1.5px 0 rgba(255,255,255,.14)}.card .tp{display:flex;justify-content:space-between;align-items:center}.pill{display:inline-block;padding:8px 16px;border-radius:99px;background:var(--t);color:#000;font:600 19px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase}.st{display:flex;align-items:center;gap:10px;font:400 20px/1 var(--mono);color:#cfcfcf}.st i{width:16px;height:16px;border-radius:50%;box-sizing:border-box;border:2.5px solid #bbb}.st[data-l='1'] i{background:linear-gradient(90deg,#fff 50%,transparent 50%);border-color:#fff}.st[data-l='2'] i{background:var(--t);border-color:var(--t)}.card h3{margin:20px 0 0;font:400 43px/1.14 var(--sans);letter-spacing:-.025em;color:#fff}.card h3.ty::after{content:'';display:inline-block;width:3px;height:.9em;margin-left:4px;vertical-align:-.1em;background:var(--cyan)}.card .ft{margin:auto 0 0;display:flex;gap:9px;font:400 20px/1 var(--sans);color:#a9a9a9}.sq{width:20px;height:20px;box-sizing:border-box;border:2px solid #8a8a8a}.sq.on{background:#fff;border-color:#fff}.card.gh{outline:3px dashed var(--cyan);outline-offset:9px}
+.ev{padding:24px 34px;border-radius:99px;background:#fff;color:#000;font:500 32px/1 var(--sans);white-space:nowrap;box-shadow:0 30px 60px -18px #000}.ev b{margin-left:18px;font:500 19px/1 var(--mono);opacity:.5}
+.beam{height:5px}.beam i{position:absolute;inset:0;background:var(--c);transform-origin:0 50%}.beam span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:9px 14px;background:#000;border:2.5px solid var(--c);color:var(--c);font:500 20px/1 var(--mono);letter-spacing:.06em;white-space:nowrap}
+.pn{box-sizing:border-box;background:#121315;border:1.5px solid #34373d;border-top:4px solid var(--k);box-shadow:0 70px 120px -30px #000}.tab{position:absolute;left:44px;top:-30px;height:58px;display:flex;align-items:center;background:#17181b;font:500 29px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:#fff;white-space:nowrap}.tab i{display:flex;align-items:center;gap:12px;height:100%;padding:0 18px;background:var(--k);color:#000;font-style:normal;font-weight:600}.tab b{font-weight:400;color:var(--magenta);padding:0 14px 0 20px}.tab span{padding-right:22px}
+.tbl{width:1120px;height:660px}.tr{position:absolute;left:0;width:100%;height:66px;display:grid;grid-template-columns:1fr 190px 210px;align-items:center;box-sizing:border-box;border-bottom:1.5px dashed #33363c;background:#121315;font:400 29px/1 var(--sans);color:#fff}.tr>span{padding-left:30px;color:#b9b9b9;font-size:25px}.tr>span:first-child{display:flex;align-items:center;gap:18px;height:100%;color:#fff;font-size:30px;background:color-mix(in srgb,var(--t) 12%,transparent);white-space:nowrap;overflow:hidden}.tr em{flex:none;width:36px;height:16px;border-radius:16px;background:var(--t)}
+.mx{width:1120px;height:700px;transform-style:preserve-3d}.mx>div{position:absolute;box-sizing:border-box;border-radius:16px;backface-visibility:hidden}.hd{padding:20px 22px;background:color-mix(in srgb,var(--t) 17%,var(--pc));font:400 27px/1.15 var(--sans);color:#fff}.hd .pill{font-size:14px;padding:6px 11px;margin-bottom:11px}.cl{background:#1a1b1f;display:grid;place-items:center}.cl i{width:46px;height:46px;box-sizing:border-box;border:4px solid #45484f}.cl i.y{background:var(--cyan);border-color:var(--cyan)}.cl i.h{border-color:var(--yellow);background:linear-gradient(90deg,var(--yellow) 50%,transparent 50%)}.cl.op{background:#fff}.cl.op i{border-color:#000}
+.rk{width:820px;height:132px;box-sizing:border-box;padding:0 34px 0 30px;display:flex;align-items:center;gap:30px;background:#16181b;border:1.5px solid #34373d;border-radius:26px;font:400 37px/1.1 var(--sans);letter-spacing:-.02em;color:#fff;box-shadow:0 40px 70px -24px #000}.rk b{font:400 62px/1 var(--mono);color:var(--magenta);min-width:84px}.rk span{flex:1}.rk em{font:400 38px/1 var(--mono);font-style:normal;color:#9a9a9a}.rk.up{background:color-mix(in srgb,var(--cyan) 20%,#16181b);border-color:var(--cyan)}.rk.up em{color:#fff}
+.tk{width:470px;box-sizing:border-box;padding:24px 27px;border-radius:26px;background:#1d1e22;font:400 30px/1.2 var(--sans);color:#fff;box-shadow:0 34px 60px -20px #000}.tk .m{display:flex;align-items:center;gap:13px;margin-top:19px;font:400 21px/1 var(--sans);color:#a9a9a9}.tk .pill{font-size:15px;padding:6px 11px}.tk em{margin-left:auto;font-style:normal}.tk u{text-decoration:none;padding:7px 8px;background:#33363c;font:400 17px/1 var(--mono);color:#fff}.tk.on{outline:3px solid var(--cyan);outline-offset:6px}.lane{font:400 24px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;color:#ededed;width:470px;display:flex;align-items:center;gap:14px}.lane b{font-weight:400;color:var(--magenta)}.lane::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,var(--magenta) 26px,#3a3a3a 26px)}
+.bb{max-width:520px;box-sizing:border-box;width:max-content;padding:22px 28px;border-radius:8px 32px 32px 32px;background:#2a2d33;font:400 30px/1.3 var(--sans);color:#fff;box-shadow:0 34px 60px -18px #000}.bb small{display:flex;align-items:center;gap:11px;margin-bottom:9px;font:500 20px/1 var(--sans)}.bb small i{width:34px;height:34px;border-radius:50%;background:var(--c);color:#000;font:500 14px/34px var(--mono);text-align:center}.bb mark{background:none;color:var(--cyan)}.br{height:76px;border-radius:16px;box-sizing:border-box;padding:0 26px;overflow:hidden;background:color-mix(in srgb,var(--t) 22%,var(--pc));font:400 28px/76px var(--sans);color:#fff;white-space:nowrap}
+.sl{width:860px;height:500px;transform-style:preserve-3d}.sl .fa{position:absolute;inset:0;transition:none}.sl .rw{position:absolute;left:30px;right:30px;height:66px;display:flex;align-items:center;padding:0 24px;border-bottom:1.5px dashed #33363c;font:400 26px/1 var(--sans);color:#8f8f8f}.sl .fa.plane{background:radial-gradient(#3b3e44 1.7px,transparent 2.2px) 0 0/25px 25px}.q{position:absolute;box-sizing:border-box;height:100px;padding:14px 16px;border-radius:18px;background:color-mix(in srgb,var(--t) 18%,var(--pc));font:400 22px/1.15 var(--sans);color:#d5d5d5;overflow:hidden}.q i{display:block;width:46px;height:12px;border-radius:12px;background:var(--t);margin-bottom:10px}.qs{position:absolute;left:0;top:0;fill:none}.qr{position:absolute;left:30px;right:30px;height:70px;display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1.5px dashed #3b3e44;background:rgba(45,226,230,.07);font:400 26px/1 var(--sans);color:#d5d5d5}.qr em{width:34px;height:14px;border-radius:14px;background:var(--cyan)}.qr u{margin-left:auto;text-decoration:none;font-size:21px;color:#8f8f8f}.qc{position:absolute;width:190px;height:62px;border-radius:12px;background:#1d1e22;display:grid;place-items:center;font:400 21px/1 var(--sans);color:#d5d5d5}.qc b{width:30px;height:30px;box-sizing:border-box;border:3px solid #50535b}.qc b.y{background:var(--cyan);border-color:var(--cyan)}.qc b.h{border-color:var(--yellow);background:linear-gradient(90deg,var(--yellow) 50%,transparent 50%)}.ql{position:absolute;top:48px;font:400 20px/1 var(--mono);color:var(--magenta);text-transform:uppercase}.ql span{color:#d5d5d5}.qb{position:absolute;top:84px;width:380px;height:386px;background:#191a1d}.qd{position:absolute;top:50px;font:400 19px/1 var(--mono);color:#8f8f8f;text-transform:uppercase}.qt{position:absolute;height:56px;border-radius:13px;padding:0 18px;box-sizing:border-box;background:color-mix(in srgb,var(--t) 22%,var(--pc));font:400 22px/56px var(--sans);color:#d5d5d5}.sl .me{position:absolute;left:215px;top:195px;width:430px;height:110px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 26px;border-radius:22px;background:#24464a;font:400 29px/1.1 var(--sans);color:#fff;transform:translateZ(1px)}.sl .me small{font:500 16px/1 var(--mono);color:var(--cyan);text-transform:uppercase;letter-spacing:.05em}
+.ly{display:flex;flex-direction:column;justify-content:flex-end;width:640px;height:400px;box-sizing:border-box;padding:30px 34px;border-radius:34px;background:rgba(27,29,34,.96);border:1.5px solid #5b5f69;box-shadow:0 60px 90px -30px #000;font:400 28px/1.42 var(--sans);color:#f0f0f0}.ly b{display:block;margin-bottom:16px;font:500 20px/1 var(--mono);color:var(--c);text-transform:uppercase;letter-spacing:.05em}.ly p{margin:0 0 9px}.ly p::before{content:'▪ ';color:var(--c)}
+.fr{will-change:transform,opacity;font:400 30px/1.2 var(--sans);color:#d5d5d5;white-space:nowrap}.orbc{width:820px;height:820px}.orbc canvas{width:820px;height:820px;display:block}
+.ask{width:920px;box-sizing:border-box;padding:30px 38px;border-radius:99px;background:#0c0c0c;border:2px solid #4a4d55;font:400 36px/1.2 var(--sans);color:#fff;white-space:nowrap}.ask b{font:400 36px/1 var(--mono);color:var(--magenta);margin-right:20px}.ask.ty::after{content:'';display:inline-block;width:3px;height:1em;margin-left:5px;vertical-align:-.14em;background:var(--cyan)}
+.ans{width:820px;font:400 37px/1.36 var(--sans);letter-spacing:-.015em;color:#8a8a8a}.ans span{color:#fff}.ans s{text-decoration:underline dashed #777 2px;text-underline-offset:8px;color:#fff}.ans s b{font:400 .72em/1 var(--mono);color:var(--cyan);margin-right:.35em}.chg{width:640px;height:88px;box-sizing:border-box;display:flex;align-items:center;gap:20px;padding:0 28px;border-radius:22px;background:#17191d;border:2px solid #4a4d55;box-shadow:0 26px 44px -16px #000;font:400 29px/1 var(--sans);color:#fff}.chg b{font:500 34px/1 var(--mono);min-width:26px}.chg em{margin-left:auto;font:400 22px/1 var(--mono);font-style:normal;color:#a9a9a9}.chg.ok{background:#0f3325;border-color:#3dff8a}.chg.ok b{color:#3dff8a!important}.src{padding:17px 24px;border-radius:18px;background:#0f3a3d;border:2px solid var(--cyan);font:400 25px/1.25 var(--sans);color:#fff;width:320px;box-sizing:border-box}.src small{display:block;font:400 17px/1 var(--mono);color:var(--cyan);margin-bottom:8px}.app{display:flex;gap:14px}.app span{padding:18px 32px;border-radius:99px;background:#fff;color:#000;font:500 27px/1 var(--sans)}.app span+span{background:#222;color:#aaa}.app.hit span:first-child{background:var(--cyan)}
+.bar{position:absolute;z-index:8;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--cyan),#3d7bff,var(--magenta),var(--yellow));transform-origin:0 50%;transform:scaleX(0)}
+.end{position:relative;z-index:1;min-height:100svh;box-sizing:border-box;padding:var(--pad);display:flex;flex-direction:column;justify-content:flex-end}.end::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(#000,transparent 35%,transparent 45%,#000 90%)}.go{display:flex;justify-content:space-between;align-items:end;gap:32px}.end h2{margin:0;font:500 clamp(44px,8vw,150px)/1 var(--sans);letter-spacing:-.045em;color:#fff}footer{display:flex;flex-wrap:wrap;gap:20px;margin-top:48px;padding-top:16px;border-top:1px dashed rgba(255,255,255,.16);font:400 12px/1 var(--mono)}footer a{color:#8a8a8a;padding:6px 0;text-underline-offset:3px}footer a:hover{color:#fff}
+.pkg{width:1910px;height:348px;box-sizing:border-box;border:5px solid #3d7bff;border-radius:38px;background:rgba(61,123,255,.1)}.pkg .bd{position:absolute;left:-5px;right:-5px;top:-5px;height:70px;box-sizing:border-box;padding:0 30px;display:flex;align-items:center;gap:22px;border-radius:38px 38px 0 0;background:color-mix(in srgb,#3d7bff 46%,#121315);font:400 36px/1 var(--sans);color:#fff}.pkg .pill{--t:#3d7bff;background:#fff;font-size:21px}.pkg em{margin-left:auto;font:400 28px/1 var(--mono);font-style:normal}.pln{width:2260px;height:1240px;background:#121315 radial-gradient(#4a4d55 2.6px,transparent 3.4px) 0 0/50px 50px}.pln .tab{transform:scale(1.9);transform-origin:0 100%;top:-58px;height:58px}
+.cv{width:920px;height:560px}.cv .tab{transform:scale(1.2);transform-origin:0 60%}.in{position:absolute;inset:58px 34px 30px}.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;height:100%}.mc{border-radius:22px;padding:20px 20px;background:color-mix(in srgb,var(--t) 18%,var(--pc));font:400 28px/1.15 var(--sans);color:#fff}.mc i{display:block;width:60px;height:17px;border-radius:17px;background:var(--t);margin-bottom:14px}.mc.dk{background:#1d1e22}.mr{height:84px;display:flex;align-items:center;gap:20px;padding:0 24px;border-bottom:2px dashed #33363c;font:400 32px/1 var(--sans);color:#fff;background:color-mix(in srgb,var(--t) 9%,transparent)}.mr em{width:44px;height:18px;border-radius:18px;background:var(--t)}.mm{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;height:100%}.mm i{position:relative;border-radius:14px;background:#1c1d21}.mm i::after{content:'';position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px;box-sizing:border-box;border:4px solid #45484f}.mm i.y::after{background:var(--cyan);border-color:var(--cyan)}.mm i.h::after{border-color:var(--yellow);background:linear-gradient(90deg,var(--yellow) 50%,transparent 50%)}.mb{height:78px;margin-top:22px;box-sizing:border-box;padding:0 24px;border-radius:16px;background:color-mix(in srgb,var(--t) 24%,var(--pc));font:400 30px/78px var(--sans);color:#fff;white-space:nowrap;overflow:hidden}.md{padding:22px 6px;border-bottom:2px dashed #33363c;font:400 27px/1.3 var(--sans);color:#a9a9a9}.md b{display:block;font:400 33px/1.2 var(--sans);color:#fff}
+.curs svg{width:30px;height:30px;display:block}.curs b{position:absolute;left:24px;top:26px;padding:5px 11px;border-radius:99px;background:currentColor;font:500 17px/1 var(--mono);-webkit-text-fill-color:#000;white-space:nowrap}
+.hh{position:absolute;left:0;top:0;transform-style:preserve-3d;display:none}.hi,.ht{position:absolute;left:0;top:0;width:max-content}.ht{font:400 250px/1 var(--mono);letter-spacing:-.045em;color:#fff;white-space:nowrap}
+.hero::before{content:'';position:absolute;inset:-120px 0 -44px;z-index:-1;background:linear-gradient(transparent,#000 62%)}
+@media(max-width:820px){:root{--pad:16px}.mast .button{height:34px;padding:0 13px;font-size:13px}.mast{padding:12px var(--pad)}.cap article{left:var(--pad)!important;right:var(--pad)!important;top:auto!important;bottom:5svh!important;max-width:none!important;text-align:left!important}.cap h2,.cap .c h2,.cap .x h2{font-size:36px}.cap p{margin-top:.6em;font-size:16px}.go{flex-direction:column;align-items:flex-start}.cap .x{top:74px!important;bottom:auto!important}.cap .c::before{display:none}.hero{bottom:34px}}
+html:not(.js) .track{height:auto}html:not(.js) .stage{position:static;height:auto;padding:120px var(--pad) 60px}html:not(.js) .hero,html:not(.js) .cap article{position:static!important;opacity:1;transform:none;max-width:none;margin:0 0 56px;text-align:left}html:not(.js) .zm,html:not(.js) .bar{display:none}
+</style></head><body><canvas class="field" aria-hidden="true"></canvas>
+<header class="mast"><a class="name" data-of="ns" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true">North Star</span></a><a class="button" href="https://north-star.atem-lab.com/">Open North Star</a></header>
+<main class="track"><div class="stage"><div class="zm" aria-hidden="true"><div class="sp"></div></div>
+<div class="hero"><h1>North Star</h1><p>Work out a startup idea, together: a canvas, its tasks and conversations, and an agent that knows all of it.</p><a class="button" href="https://north-star.atem-lab.com/">Open North Star</a></div>
+<div class="cap"><article class="l"><h2>Somebody has a problem</h2><p>That is where an idea starts, not with the idea. Put the person and what bothers them on a card each, in one plain sentence.</p></article><article class="r"><h2>But is it true?</h2><p>Everything starts as a guess. Interviews, numbers and things you saw count for it or against it, until you know.</p></article><article class="t"><h2>Then comes your answer</h2><p>This idea solves that problem, for them. The links hold the why, so it doesn’t live only in your head.</p></article><article class="t"><h2>Together, they add up</h2><p>A problem breaks into smaller ones, features ship as a package, and every piece stays tied to why it’s there.</p></article><article class="l"><h2>Same thinking, as a list</h2><p>The very same cards, now rows. Sort them, filter them, add a column for anything you track. Nothing is copied.</p></article><article class="r"><h2>Find what nobody does</h2><p>Set your features against your rivals’, cell by cell, with how sure you are. The row nobody fills is yours.</p></article><article class="l"><h2>So you know what’s first</h2><p>Impact, effort, and how much of it you have checked. North Star suggests an order. You decide.</p></article><article class="b"><h2>And who does it by Friday</h2><p>Tasks with a name and a day, a timeline, a conversation on any card. The work sits where the thinking is.</p></article><article class="b"><h2>The whole idea, on one canvas</h2><p>Every line of thought, every list and plan, side by side with your team in it. Zoom in to think, zoom out to see.</p></article><article class="l"><h2>Look closer: it’s one card</h2><p>On the plane, in the list, the matrix, the order, the tasks and the days. Not six copies. Change it once and it has changed everywhere.</p></article><article class="l"><h2>With everything behind it</h2><p>On top, one line. Underneath, the interviews, documents, arguments and tasks it rests on. Nobody reads all of that every time.</p></article><article class="c"><h2>Your agent does.</h2><p>Every card, link, document and conversation, down to the bottom. It sees what you don’t have on screen.</p></article><article class="x"><h2>Ask it what matters</h2></article></div><div class="bar" aria-hidden="true"></div></div></main>
+<section class="end"><div class="go"><h2>Bring an idea.</h2><a class="button" href="https://north-star.atem-lab.com/">Open North Star</a></div><footer><a href="/">ATEM</a><a href="/impressum">Impressum</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></footer></section>
+<script src="/backdrop.js"></script><script>
+(() => {
+    document.documentElement.classList.add('js');
+    const $ = (s, r = document) => r.querySelector(s), stage = $('.stage'), zm = $('.zm'), sp = $('.sp'), track = $('.track');
+    const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), seg = (p, a, b) => clamp((p - a) / (b - a)), mix = (a, b, t) => a + (b - a) * t;
+    const io = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2), out = (t) => 1 - Math.pow(1 - t, 4), back = (t) => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
+    const set = (e, k, v) => { if (e['_' + k] !== v) { e['_' + k] = v; e.style[k] = v; } };
+    const text = (e, v) => { if (e._t !== v) { e._t = v; e.textContent = v; } }, cls = (e, k, on) => { if (e['_c' + k] !== on) { e['_c' + k] = on; e.classList.toggle(k, on); } };
+    let sw = 0, sh = 0, tall = innerWidth <= 820, u = 1, fx = 0, fm = 1, fy = 0;
+    // Every piece is an actor with its own path: [P, x, y, scale, turnX, turnY, turnZ, opacity, depth]. Nothing lies on a canvas.
+    const actors = []; let zoomP = 1, zoomC = 1;
+    const A = (c, html, keys, w) => { const e = document.createElement('div'); e.className = 'a ' + c; e.innerHTML = html; if (w) e.style.width = w + 'px'; sp.append(e); const a = { e, keys }; actors.push(a); return a; };
+    const place = (a, P) => {
+      const K = a.keys; let i = 0;
+      if (P < K[0][0] || P > K[K.length - 1][0]) { set(a.e, 'visibility', 'hidden'); return; }
+      while (i < K.length - 2 && P >= K[i + 1][0]) i++;
+      const p = K[i], q = K[i + 1], raw = seg(P, p[0], q[0]), t = (q[9] || io)(raw), v = (k, d) => mix(p[k] ?? d, q[k] ?? d, t);
+      let x = v(1, 0), y = v(2, 0), s = v(3, 1); if (a.zp) { x *= zoomP; y = 60 + (y - 60) * zoomP + 150 * (1 - zoomP); s *= zoomP; } if (a.zc) { x *= zoomC; y = y * zoomC - 165 * (1 - zoomC); s *= zoomC; } if (tall) { x = (x - fx) * fm; y = y * fm - fy; s *= fm; }
+      const o = v(7, 1);
+      set(a.e, 'visibility', o > 0.003 ? 'visible' : 'hidden'); set(a.e, 'opacity', o >= 1 ? '' : o.toFixed(3));
+      set(a.e, 'transform', `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${v(8, 0).toFixed(1)}px) rotateY(${v(5, 0).toFixed(2)}deg) rotateX(${v(4, 0).toFixed(2)}deg) rotateZ(${v(6, 0).toFixed(2)}deg) scale(${s.toFixed(4)})`);
     };
-    hold(false);
-    b.addEventListener('click', () => { hold(!v.held); if (v.held) v.pause(); else v.play().catch(() => {}); });
-    seen.observe(v);
-  }
-</script>
-</body>
-</html>
+    const TONE = { customer: '#3dff8a', problem: '#ff3d9a', idea: '#ededed', feature: '#2de2e6', competitor: '#ffd23f' }, W = ['hypothesis', 'testing', 'validated'];
+    const card = (k, t, keys, sq = 0) => { const a = A('card', `<div class="tp"><span class="pill">${k}</span><span class="st" data-l="0"><i></i><u style="text-decoration:none">hypothesis</u></span></div><h3></h3><div class="ft">${'<span class="sq"></span>'.repeat(sq)}</div>`, keys); a.e.style.setProperty('--t', TONE[k]); a.h = $('h3', a.e); a.st = $('.st', a.e); a.sq = [...a.e.querySelectorAll('.sq')]; a.t = t; text(a.h, t); return a; };
+    const type = (a, t) => { text(a.h, a.t.slice(0, Math.round(a.t.length * t))); cls(a.h, 'ty', t > 0 && t < 1); };
+    const status = (a, l) => { if (a.l !== l) { a.l = l; a.st.dataset.l = l; a.st.lastChild.textContent = W[l]; } };
+
+    // 1–3: the cards.
+    const C1 = card('customer', 'Office workers', [[0.72, 1700, -700, 0.95, 30, -80, 40, 1, 300], [1.3, 330, -170, 0.86, 6, -18, -5, 1, 0, out], [1.95, 310, -190, 0.86, 5, -14, -4], [2.3, -1500, -420, 0.8, 0, 50, -30], [2.9, -1500, -100, 0.7, 0, 60, -20], [3.25, -560, 60, 0.7, 0, 0, 0, 1, 0, out], [3.92, -560, 60, 0.7], [4.25, 260, -200, 0.5, -85, -20, 6, 0]]);
+    const C2 = card('problem', 'Delivery lunch is greasy and costs €14', [[1.3, 700, 1100, 0.95, -50, 10, 40, 1, 200], [1.68, 430, 130, 0.84, 4, -12, 5, 1, 90, out], [1.95, 440, 115, 0.84, 4, -10, 4, 1, 90], [2.28, -330, 10, 1.12, 4, 16, -3, 1, 0], [2.92, -300, 0, 1.12, 3, 8, -1], [3.25, 0, 60, 0.7, 0, 0, 0, 1, 0, out], [3.92, 0, 60, 0.7], [4.28, 260, -110, 0.5, -85, -20, 6, 0]], 3);
+    const C3 = card('idea', 'Home cooks sell tomorrow’s lunch', [[2.95, 1500, 900, 0.9, -60, -40, 50, 1, 200], [3.35, 560, 60, 0.7, 0, 0, 0, 1, 0, out], [3.92, 560, 60, 0.7], [4.31, 260, -20, 0.5, -85, -20, 6, 0]]);
+    const EV = [['“€14 for a soggy wrap”', 'interview', 2.3, -500, -1000, -24], ['31 of 40 order in twice a week', 'data', 2.46, -1500, 300, 18], ['The queue is gone by 12:30', 'observation', 2.62, -300, 1000, 30]].map(([t, k, a, x, y, r]) => A('ev', `${t}<b>${k}</b>`, [[a - 0.12, x, y, 1, 0, -50, r, 1, 500], [a + 0.1, -260, y * 0.26, 0.8, 0, -10, r * 0.25, 1, 200, out], [a + 0.2, -290, y * 0.18 + 30, 0.78, 0, 0, r * 0.1, 1, 180], [a + 0.27, -300, 80, 0.2, 0, 0, 0, 0, 60]]));
+    const beam = (x1, x2, c, w, p) => { const a = A('beam', `<i></i><span>${w}</span>`, [[p, (x1 + x2) / 2, 60, 1], [3.9, (x1 + x2) / 2, 60, 1], [3.97, (x1 + x2) / 2, 60, 1, 0, 0, 0, 0]], Math.abs(x2 - x1)); a.e.style.setProperty('--c', c); a.p = p; return a; };
+    const B = [beam(-350, -210, '#d6d6d6', 'FOR', 3.42), beam(210, 350, '#a78bfa', 'SOLVES', 3.56)];
+
+    // 4: the table, in at an angle, its rows dealt in from the side.
+    const ic = { table: 'M1 3h18M1 8h18M1 13h18M1 17h18', plane: 'M1 2h9v6H1zM10 10h9v6h-9zM5 8v5h5', matrix: 'M1 1h16v16H1zM1 6.5h16M1 11.5h16M6.5 1v16M11.5 1v16', deck: 'M1 1h5v16H1zM8 1h5v10H8zM15 1h4v7h-4z', timeline: 'M1 1v16M4 3h9M7 9h11M4 15h7' };
+    const tab = (k, n, t) => `<div class="tab"><i><svg viewBox="0 0 20 18" width="31" height="28"><path d="${ic[k]}" fill="none" stroke="#000" stroke-width="2"/></svg>${k}</i><b>${n}</b><span>${t}</span></div>`;
+    const TB = A('pn tbl', tab('table', '02', 'Lunch'), [[3.98, 1900, 260, 1, 12, -70, 16, 1, 200], [4.35, 330, 20, 0.84, 14, -26, 5, 1, 0, out], [4.93, 310, -10, 0.84, 8, -16, 2], [5.22, -1700, -260, 0.9, 10, 60, -24]]);
+    TB.e.style.setProperty('--k', '#6cb6ff'); 
+    const ROWS = [['Office workers', 'customer', 'validated'], ['Delivery lunch is greasy and costs €14', 'problem', 'validated'], ['Home cooks sell tomorrow’s lunch', 'idea', 'testing'], ['Pre-order by 9 pm', 'feature', 'planned'], ['Portion counter', 'feature', 'planned'], ['Pickup shelf with a QR code', 'feature', 'planned'], ['Offices without a canteen', 'customer', 'testing'], ['Fees eat €4.70 an order', 'problem', 'validated'], ['A pickup shelf in each lobby', 'idea', 'hypothesis']].map(([t, k, s], i) => { const e = document.createElement('div'); e.className = 'tr'; e.style.cssText = `top:${52 + i * 67}px;--t:${TONE[k]}`; e.innerHTML = `<span><em></em>${t}</span><span>${k}</span><span>${s}</span>`; TB.e.append(e); return e; });
+
+    // 5: the matrix, tiles turning up, then the empty row lifts out.
+    const MX = A('mx', '', [[4.95, -420, 900, 0.95, 70, 10, -40, 1, -200], [5.35, -290, 20, 0.84, 44, 6, -24, 1, 0, out], [5.6, -290, 0, 0.84, 40, 6, -20], [5.92, -280, -30, 0.8, 24, 14, -8], [6.22, -300, -1300, 0.95, 70, 0, 20]]);
+    const TL = [], mxd = (c, x, y, w, h, html, t, o) => { const e = document.createElement('div'); e.className = c; e.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${h}px;--t:${t || '#fff'}`; e.innerHTML = html; MX.e.append(e); TL.push([e, o]); return e; };
+    ['Lunchpost', 'Stubenkoch', 'Topfretter', 'Wegbote'].forEach((n, c) => mxd('hd', 380 + c * 186, 0, 174, 130, `<span class="pill">rival</span><br>${n}`, TONE.competitor, c + 1));
+    const OPENR = [];
+    ['Pre-order by 9 pm', 'Pickup shelf with a QR code', 'Portion counter'].forEach((n, r) => { const h = mxd('hd', 0, 146 + r * 184, 366, 170, `<span class="pill">feature</span><br>${n}`, TONE.feature, r + 1); if (r === 2) OPENR.push(h); [['h', 'y', '', 'h'], ['', '', 'h', ''], ['', '', '', '']][r].forEach((m, c) => { const e = mxd('cl', 380 + c * 186, 146 + r * 184, 174, 170, `<i class="${m}"></i>`, 0, c + r + 2); if (r === 2) OPENR.push(e); }); });
+
+    // 6: the order, slabs that change places.
+    const RK = [['Pre-order by 9 pm', '4.5', 0, 1], ['Pickup shelf with a QR code', '1.0', 1, 2], ['Portion counter', '9.0', 2, 0]].map(([t, n, f, to], i) => { const y = (k) => -200 + k * 190; const a = A('rk', `<b></b><span>${t}</span><em>${n}</em>`, [[6.0 + i * 0.05, 1800, y(f) + 300, 1, 10, -80, 30 - i * 24, 1, 300], [6.36 + i * 0.05, 330 + f * 34, y(f), 0.82, 8, -24, 2, 1, f * 60, out], [6.55, 330 + f * 34, y(f), 0.82, 8, -24, 2, 1, f * 60], [6.68, 330 + (to === 0 ? -150 : 90), (y(f) + y(to)) / 2, 0.82, 8, -24, 2, 1, to === 0 ? 420 : -120], [6.8, 330 + to * 34, y(to), 0.82, 8, -24, 2, 1, 120 - to * 60, out], [6.95, 320 + to * 34, y(to), 0.82, 6, -20, 1, 1, 120 - to * 60], [7.2, -1900, y(to) - 200, 1, 0, 70, -20 + i * 14, 1, 0]]); a.num = $('b', a.e); a.f = f; a.to = to; return a; });
+
+    // 7: the work, three lanes running past each other at their own pace, talk landing on top.
+    const tk = (t, k, n, d, w, x, y0, v, hot) => A('tk' + (hot || ''), `${t}<div class="m"><span class="pill" style="--t:${TONE[k]}">${k}</span><span>${n}</span><em>◷ ${d}</em><u>${w}</u></div>`, [[7.0, x * 1.25 + v * 900, y0 + v * 1500, 1, 30, -8, -10, 1, -100], [7.35, x, y0 + v * 120, 0.86, 30, -8, -10, 1, 0, out], [7.84, x - v * 14, y0 - v * 130, 0.86, 26, -6, -8], [8.0, x * 1.5, y0 - v * 1500, 0.8, 50, 0, -20]]);
+    const lanes = [[-560, 1], [0, -1], [560, 1]];
+    tk('Ask which permit cooks need', 'customer', 'Home cooks', 'tue', 'AD', -600, -330, 1); tk('Price it: €39 or €45 a week', 'idea', 'Weekly plan', '1 nov', 'YO', -600, -90, 1); tk('Write the allergen list', 'feature', 'Labels', 'mon', 'LH', -600, 150, 1);
+    tk('Order cut-off from 8 to 9 pm', 'feature', 'Pre-order', 'thu', 'YO', -80, -260, -1);
+    const TKH = tk('Test it with five cooks', 'feature', 'Portion counter', 'fri', 'JW', -80, -20, -1); tk('Sign up five more cooks', 'customer', 'Home cooks', 'wed', 'AD', -80, 220, -1);
+    tk('Interview 12 office workers', 'problem', 'Lunch', 'done', 'AD', 440, -350, 1); tk('Two-week pilot', 'idea', 'Tomorrow’s lunch', 'done', 'JW', 440, -110, 1);
+    const bb = (w, i, c, t, a, x, y, r) => A('bb', `<small><i style="--c:${c}">${i}</i>${w}</small>${t}`, [[a - 0.08, x + 200, y + 260, 0.5, 0, 0, r * 3, 0, 500], [a + 0.04, x, y, 0.95, 0, 0, r, 1, 320, back], [7.84, x - 30, y - 30, 0.95, 0, 0, r, 1, 320], [8.0, x * 2.2, y - 900, 0.9, 0, 0, r * 5, 1, 320]]);
+    bb('Ayla', 'AD', '#ffd23f', '<mark>@Jonas</mark> can we test this with five cooks?', 7.46, 330, 80, -3); bb('Jonas', 'JW', '#ff3d9a', 'On it. Friday.', 7.62, 560, 260, 4);
+
+    // 8: six pages, one card through all of them; they close up and it is one card.
+    const mc = (k, t, x, y, w = 250) => `<div class="q" style="--t:${TONE[k]};left:${x}px;top:${y}px;width:${w}px"><i></i>${t}</div>`;
+    const pages = [
+      ['plane', '01', 'Lunch', '#ededed', `<svg class="qs" width="860" height="500"><path d="M150 148V195M430 195V148M645 250H700M215 250H180M430 305V352" stroke="#6cb6ff" stroke-width="3"/></svg>` + mc('idea', 'Home cooks sell', 300, 48) + mc('problem', 'Lunch costs €14', 30, 48, 230) + mc('feature', 'Pre-order', 30, 205, 150) + mc('feature', 'Shelf', 700, 205, 130) + mc('feature', 'Send at nine', 300, 352) + mc('customer', 'Office workers', 590, 48, 240)],
+      ['table', '02', 'Features', '#6cb6ff', ['Pre-order by 9 pm', 'Pickup shelf', 0, 'Allergen labels', 'Weekly plan'].map((t, i) => t ? `<div class="qr" style="top:${[46, 118, 0, 322, 394][i]}px"><em></em>${t}<u>planned</u></div>` : '').join('')],
+      ['matrix', '03', 'Rivals', '#a78bfa', [0, 1, 2, 3].map((r) => [0, 1, 2, 3].map((c) => (r === 2 && c < 3) || (c === 0 && r === 2) ? '' : `<div class="qc" style="left:${30 + c * 204}px;top:${r < 2 ? 46 + r * 74 : 322 + (r - 3) * 74 + (r === 2 ? 0 : 0)}px">${c ? `<b class="${['h', 'y', '', 'h', '', ''][(r * 3 + c) % 6]}"></b>` : ['', 'Pre-order', '', 'Shelf'][r]}</div>`).join('')).join('')],
+      ['deck', '04', 'Priorities', '#e3c77a', `<div class="ql" style="left:30px">01 <span>quick wins</span></div><div class="ql" style="left:450px">02 <span>big bets</span></div><div class="qb" style="left:30px"></div><div class="qb" style="left:450px"></div>` + mc('feature', 'Labels', 50, 340, 340) + mc('feature', 'Pre-order', 660, 110, 150) + mc('feature', 'Shelf', 470, 340, 340)],
+      ['deck', '05', 'Launch', '#e3c77a', `<div class="ql" style="left:30px">01 <span>to do</span></div><div class="ql" style="left:315px">02 <span>doing</span></div><div class="ql" style="left:600px">03 <span>done</span></div>` + mc('customer', 'Ask which permit', 30, 96, 165) + mc('idea', 'Price it', 30, 340, 250) + mc('feature', 'Cut-off', 315, 340, 250) + mc('problem', 'Interview 12', 665, 96, 165) + mc('idea', 'Pilot', 665, 340, 165)],
+      ['timeline', '06', 'Days', '#ff9a52', ['m 26', 't 27', 'w 28', 't 29', 'f 30'].map((d, i) => `<div class="qd" style="left:${40 + i * 160}px">${d}</div>`).join('') + `<div class="qt" style="--t:#3dff8a;left:40px;top:104px;width:300px">Permit</div><div class="qt" style="--t:#2de2e6;left:360px;top:334px;width:380px">Order cut-off</div><div class="qt" style="--t:#ededed;left:200px;top:404px;width:560px">Two-week pilot</div>`]];
+    const from = [[-1700, -500, 60], [1800, -700, -50], [1900, 400, 40], [-1600, 800, -70], [300, -1300, 30], [500, 1300, -40]];
+    const SL = pages.map(([k, n, t, c, r], i) => { const d = i - 2.5, fx = from[i]; const a = A('pn sl', tab(k, n, t) + `<div class="fa ${k}">${r}</div><div class="me"><small>feature</small>Portion counter</div>`, [[8.0 + i * 0.03, fx[0], fx[1], 0.9, fx[2], -fx[2], fx[2] / 2, 1, 300], [8.34 + i * 0.03, 350 + d * 112, 10 - d * 46, 0.76, 6, -42, 2, 1, -d * 190, out], [8.62, 350 + d * 112, 0 - d * 46, 0.76, 6, -40, 2, 1, -d * 190], [8.84, 330, 0, 0.82, 0, 0, 0, 1, -d * 3], [8.9, 330, 0, 0.82, 0, 0, 0, i ? 0 : 0, -d]]); a.e.style.setProperty('--k', c); a.fa = $('.fa', a.e); a.me = $('.me', a.e); a.tab = $('.tab', a.e); return a; });
+
+    // 9: that card, and what it stands on.
+    const ONE = card('feature', 'Portion counter', [[8.8, 330, 0, 0.45, 0, 0, 0, 0], [8.88, 330, 0, 0.62, 0, 0, 0, 1, 20], [8.98, 330, 0, 1, 0, 0, 0, 1, 20, back], [9.1, 330, 0, 1, 0, 0, 0, 1, 20], [9.45, 380, -290, 0.74, 56, 0, -32, 1, 60], [9.95, 380, -300, 0.74, 56, 0, -30, 1, 60], [10.22, 0, -40, 0.06, 80, 0, 120, 0, 0]], 2); status(ONE, 1);
+    const LY = [['evidence', '#3dff8a', ['11 of 12 cooks guess portions', '“I threw away four boxes”', '9 pm is when they plan']], ['documents', '#6cb6ff', ['Interviews: how cooks plan', 'Where the €14 goes', 'Permit, private kitchens']], ['talk', '#ffd23f', ['Lena: they plan on paper', 'Ayla: test it with five?', 'Jonas: on it, Friday']], ['tasks and plan', '#ff3d9a', ['Test with five cooks · fri', 'Send at nine sharp · wed', 'Quick win, score 9.0']]].map(([n, c, r], i) => { const a = A('ly', `<b>${n}</b>${r.map((x) => `<p>${x}</p>`).join('')}`, [[9.12, 340, 0, 0.8, 0, 0, 0, 0, -10 - i], [9.2, 350, -60, 0.8, 14, 0, -8, 1, -10 - i * 2], [9.55 + i * 0.04, 380, -150 + i * 140, 0.74, 56, 0, -32, 1, -40 - i * 30, out], [9.95, 380, -158 + i * 146, 0.74, 56, 0, -30, 1, -40 - i * 30], [10.16 + i * 0.03, 0, -40, 0.05, 80, 0, 160 + i * 60, 0]]); a.e.style.setProperty('--c', c); return a; });
+
+
+    // Cards make a plane: the ground comes up under them as the eye draws back, more cards land on it.
+    const XC = [], p4 = (g) => 3.92 + (g - 4.97) * 1.03 / 1.43;
+    const G_ = (a) => (a.g = true, a), ZP = (a) => (a.zp = true, a), ZC = (a) => (a.zc = true, a);
+    [C1, C2, C3, ...B].forEach(ZP);
+    const PLN = ZP(G_(A('pn pln', tab('plane', '01', 'Lunch'), [[3.95, 0, 60, 1, 0, 0, 0, 0, -6], [4.16, 0, 60, 1, 0, 0, 0, 1, -6], [5.34, 0, 60, 1, 0, 0, 0, 1, -6], [5.56, -900, 60, 0.94, 6, 34, -2, 1, -160], [5.86, -4600, 200, 0.9, 10, 74, -10, 1, -300, (t) => t * t]]))); PLN.e.style.setProperty('--k', '#ededed');
+    [['customer', 'Offices without a canteen', -620, -330, -1400, -900, 0.7], ['problem', 'Fees eat €4.70 an order', -160, -330, 200, -1400, 0.48], ['idea', 'A pickup shelf in each lobby', 800, -330, 1700, -700, 0.7], ['feature', 'Pre-order by 9 pm', -700, 490, -1600, 1200, 0.62], ['feature', 'Pickup shelf with a QR code', -240, 490, -200, 1500, 0.62], ['feature', 'Portion counter', 220, 490, 1500, 1200, 0.62]].forEach(([k, t, x, y, fx, fy, sc], i) => { XC[i] = ZP(G_(card(k, t, [[4.22 + i * 0.05, fx * 1.6, fy * 1.6, 1, 40, -40, 40 - i * 16, 1, 500], [4.46 + i * 0.05, x, y, sc, 0, 0, 0, 1, 0, out], [4.97, x, y, sc]]))); });
+    const RZ = (a) => (a.zp = true, a.r = true, a);
+    // Parts of a problem, a part of a feature, a package round the ones that ship together, and the links that say so.
+    const PART = [['problem', 'It arrives cold', 160, -330, 0.48, 0, 60, 300, -1500], ['feature', 'Send the count at nine', 720, 490, 0.46, 220, 490, 1900, 900]].map(([k, t, x, y, sc, px, py, fx, fy], i) => RZ(card(k, t, [[4.4 + i * 0.16, fx * 1.5, fy * 1.5, 1, 40, 30, 40, 1, 500], [4.66 + i * 0.16, x, y, sc, 0, 0, 0, 1, 1, out], [5.34, x, y, sc, 0, 0, 0, 1, 1], [5.46, px, py, 0.12, 0, 0, 0, 0, -2]])));
+    const PKG = RZ(A('pkg', '<div class="bd"><span class="pill">package</span>Launch at Factory<em>[−] 4</em></div>', [[4.92, 10, 452, 1.04, 0, 0, 0, 0, -3], [5.04, 10, 452, 1, 0, 0, 0, 1, -3, out], [5.36, 10, 452, 1, 0, 0, 0, 1, -3], [5.46, 10, 452, 0.94, 0, 0, 0, 0, -3]]));
+    const LN = [[-160, -257, -70, -42, '#6cb6ff', 'PART OF', 4.84], [160, -257, 70, -42, '#6cb6ff', 'PART OF', 4.88], [590, -330, 305, -330, '#a78bfa', 'SOLVES', 4.96], [560, 278, 560, 162, '#6cb6ff', 'PART OF', 5.06], [-610, -228, -575, -42, '#6cb6ff', 'PART OF', 4.92], [582, 490, 408, 490, '#6cb6ff', 'PART OF', 5.0]].filter((l) => l[6]).map(([x1, y1, x2, y2, c, w, p]) => { const L = Math.hypot(x2 - x1, y2 - y1), an = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI, a = RZ(A('beam', `<i></i><span>${w}</span>`, [[p, (x1 + x2) / 2, (y1 + y2) / 2, 1, 0, 0, an, 1, -1], [5.38, (x1 + x2) / 2, (y1 + y2) / 2, 1, 0, 0, an, 1, -1], [5.42, (x1 + x2) / 2, (y1 + y2) / 2, 1, 0, 0, an, 0, -1]], L)); a.e.style.setProperty('--c', c); a.p = p; a.e.lastChild.style.transform = `translate(-50%,-50%) rotate(${-an}deg)`; return a; });
+    // The handover: each card lifts off the plane and lands in its row; the emptied plane swings out to the side.
+    const pose = (a, P) => { const K = a.keys; let i = 0; while (i < K.length - 2 && P >= K[i + 1][0]) i++; const p = K[i], q = K[i + 1], t = (q[9] || io)(seg(P, p[0], q[0])); return [1, 2, 3, 4, 5, 6].map((k) => mix(p[k] ?? (k === 3 ? 1 : 0), q[k] ?? (k === 3 ? 1 : 0), t)); };
+    [C1, C2, C3, XC[3], XC[5], XC[4], XC[0], XC[1], XC[2]].forEach((a, i) => {
+      const g0 = 5.0 + i * 0.05, g1 = 5.43 + i * 0.05, T = (g) => (a.g ? g : p4(g)), [bx, by, bs, rx, ry, rz] = pose(TB, p4(g1)), D = Math.PI / 180;
+      let X = -470 * bs, Y = (-330 + 52 + i * 67 + 33) * bs, Z = 0;
+      [X, Y] = [X * Math.cos(rz * D) - Y * Math.sin(rz * D), X * Math.sin(rz * D) + Y * Math.cos(rz * D)];
+      [Y, Z] = [Y * Math.cos(rx * D), Y * Math.sin(rx * D)];
+      [X, Z] = [X * Math.cos(ry * D) + Z * Math.sin(ry * D), -X * Math.sin(ry * D) + Z * Math.cos(ry * D)];
+      const last = a.keys.filter((k) => k[0] <= (a.g ? 4.97 : 3.92)).at(-1), [hx0, hy0] = [last[1], last[2]], z = 0.46, ux = (v) => v / z, uy = (v) => (v - 141) / z + 60, sx = hx0 * z, sy = 60 + (hy0 - 60) * z + 81, tx = bx + X, ty = by + Y;
+      a.keys = [...a.keys.filter((k) => k[0] <= (a.g ? 4.97 : 3.92)), [T(g0), hx0, hy0, last[3], 0, 0, 0, 1, 0], [T(g0 + 0.2), ux(mix(sx, tx, 0.42)), uy(mix(sy, ty, 0.42) - 150), 0.8, 16, -26, i % 2 ? 9 : -9, 1, 340, (t) => Math.sin(t * Math.PI / 2)], [T(g1 - 0.03), ux(tx), uy(ty), 0.42, rx, ry, rz, 1, Z + 24, (t) => 1 - Math.cos(t * Math.PI / 2)], [T(g1 + 0.02), ux(tx), uy(ty), 0.2, rx, ry, rz, 0, Z + 4]];
+    });
+
+    // Planes and the rest make the canvas: pieces come in from every side and lock beside each other.
+    const mini = { plane: (c) => `<div class="mg">${c.map(([k, t]) => `<div class="mc" style="--t:${TONE[k]}"><i></i>${t}</div>`).join('')}</div>`, table: (c) => c.map(([k, t]) => `<div class="mr" style="--t:${TONE[k]}"><em></em>${t}</div>`).join(''), matrix: () => `<div class="mm">${'hy.h..h.....'.split('').map((m) => `<i class="${m === '.' ? '' : m}"></i>`).join('')}</div>`, deck: (c) => `<div class="mg">${c.map(([k, t]) => `<div class="mc dk" style="--t:${TONE[k]}"><i></i>${t}</div>`).join('')}</div>`, timeline: (c) => c.map(([k, t], i) => `<div class="mb" style="--t:${TONE[k]};margin-left:${[4, 22, 40, 14][i]}%;width:${[34, 52, 40, 30][i]}%">${t}</div>`).join(''), docs: (c) => c.map((t) => `<div class="md"><b>${t[0]}</b>${t[1]}</div>`).join('') };
+    ic.docs = 'M3 1h9l4 4v12H3zM6 8h7M6 12h7';
+    const CV = [['plane', '01', 'Lunch', '#ededed', 0, 0, [['customer', 'Office workers'], ['problem', 'Lunch costs €14'], ['idea', 'Home cooks sell'], ['feature', 'Pre-order'], ['feature', 'Pickup shelf'], ['feature', 'Portion counter']], 0, 0],
+      ['plane', '02', 'Money', '#ededed', -1010, 0, [['customer', 'Team leads'], ['problem', 'Fees eat €4.70'], ['idea', 'Weekly plan'], ['competitor', 'Wegbote'], ['competitor', 'Lunchpost'], ['feature', 'Team order']], -2600, 300],
+      ['table', '03', 'Features', '#6cb6ff', 1010, 0, [['feature', 'Pre-order by 9 pm'], ['feature', 'Pickup shelf'], ['feature', 'Portion counter'], ['feature', 'Allergen labels'], ['feature', 'Weekly plan']], 2600, -500],
+      ['matrix', '04', 'Rivals', '#a78bfa', -1010, -640, 0, -2000, -1900], ['deck', '05', 'Launch', '#e3c77a', 0, -640, [['customer', 'Ask which permit'], ['feature', 'Order cut-off'], ['problem', 'Interview 12'], ['feature', 'Five cooks'], ['idea', 'Price it'], ['customer', 'Sign up cooks']], 300, -2300],
+      ['timeline', '06', 'Days', '#ff9a52', 1010, -640, [['customer', 'Permit'], ['feature', 'Portion counter'], ['idea', 'Two-week pilot'], ['problem', 'Survey']], 2500, -1700], ['docs', '07', 'Research', '#9cc96a', -1010, 640, [['Interviews', 'Twelve people, three offices.'], ['Where the €14 goes', 'Fees before any food.'], ['Permit', 'Private kitchens may sell.']], -2500, 1800], ['plane', '08', 'Cooks', '#ededed', 0, 640, [['customer', 'Home cooks'], ['problem', 'Food thrown away'], ['idea', 'Tell them tonight'], ['feature', 'Counter'], ['feature', 'Ratings'], ['problem', 'Permits']], -300, 2400], ['deck', '09', 'Priorities', '#e3c77a', 1010, 640, [['feature', 'Portion counter'], ['feature', 'Pre-order'], ['feature', 'Labels'], ['feature', 'Shelf'], ['feature', 'Tips'], ['feature', 'Team order']], 2600, 1900],
+    ].map(([k, n, t, c, x, y, d, fx, fy], i) => { const at = 9.16 + (i ? 0.1 + ((i * 5) % 8) * 0.04 : 0); const a = ZC(G_(A('pn cv', tab(k, n, t) + `<div class="in">${mini[k](d || [])}</div>`, i ? [[at, fx * 1.5, fy * 1.5, 1, fy / 60, -fx / 60, (i % 2 ? 1 : -1) * 34, 1, 700], [at + 0.34, x, y, 1, 0, 0, 0, 1, 0, out], [10.16, x, y, 1], [10.34, x * 2.6, y * 2.6, 1.2, 0, x / 40, 0, 0, 500]] : [[9.0, 0, 900, 1, 60, 0, 0, 0, -600], [9.2, 0, 0, 1, 0, 0, 0, 1, 0, out], [10.16, 0, 0, 1], [10.34, 0, 0, 0.6, 0, 0, 0, 0, -600]]))); a.e.style.setProperty('--k', c); return a; });
+    const CUR = [['Ayla', -700, 500, 200, -380], ['Jonas', 900, -500, 620, 420], ['you', -1300, -300, -420, 120]].map(([n, x, y, x2, y2], i) => ZC(G_(A('curs', `<svg viewBox="0 0 22 22"><path d="M3 2l15 8-6.5 1.8L8.6 18z" fill="currentColor" stroke="#000"/></svg><b>${n}</b>`, [[9.56 + i * 0.06, x * 1.6, y * 1.8, 2.2, 0, 0, 0, 0, 60], [9.66 + i * 0.06, x, y, 2.2, 0, 0, 0, 1, 60], [10.1, x2, y2, 2.2, 0, 0, 0, 1, 60], [10.2, x2, y2, 2.2, 0, 0, 0, 0, 60]]))));
+
+    // The hero: the pieces of the app going round the name, which stays where it is.
+    const hx = document.createElement('div'); hx.className = 'sp'; zm.append(hx);
+    const el2 = (c, h, p) => { const e = document.createElement('div'); e.className = c; e.innerHTML = h; (p || hx).append(e); return e; };
+    const cardH = (k, t, l = 0, sq = 0) => `<div class="card" style="--t:${TONE[k]}"><div class="tp"><span class="pill">${k}</span><span class="st" data-l="${l}"><i></i><u style="text-decoration:none">${W[l]}</u></span></div><h3>${t}</h3><div class="ft">${'<span class="sq on"></span>'.repeat(sq)}</div></div>`;
+    const evH = (t, k) => `<div class="ev">${t}<b>${k}</b></div>`, tkH = (t, k, n, d, w) => `<div class="tk">${t}<div class="m"><span class="pill" style="--t:${TONE[k]}">${k}</span><span>${n}</span><em>◷ ${d}</em><u>${w}</u></div></div>`, bbH = (w, i, c, t) => `<div class="bb"><small><i style="--c:${c}">${i}</i>${w}</small>${t}</div>`, cvH = (i) => { const [k, n, t, c, , , d] = CVD[i]; return `<div class="pn cv" style="--k:${c}">${tab(k, n, t)}<div class="in">${mini[k](d || [])}</div></div>`; };
+    const CVD = [['table', '03', 'Features', '#6cb6ff', 0, 0, [['feature', 'Pre-order by 9 pm'], ['feature', 'Pickup shelf'], ['feature', 'Portion counter'], ['feature', 'Allergen labels'], ['feature', 'Weekly plan']]], ['matrix', '04', 'Rivals', '#a78bfa', 0, 0, 0], ['timeline', '06', 'Days', '#ff9a52', 0, 0, [['customer', 'Permit'], ['feature', 'Portion counter'], ['idea', 'Two-week pilot'], ['problem', 'Survey']]], ['plane', '01', 'Lunch', '#ededed', 0, 0, [['customer', 'Office workers'], ['problem', 'Lunch costs €14'], ['idea', 'Home cooks sell'], ['feature', 'Pre-order'], ['feature', 'Pickup shelf'], ['feature', 'Portion counter']]]];
+    const PIECES = [cardH('customer', 'Office workers', 2), cvH(1), evH('“€14 for a soggy wrap”', 'interview'), cardH('problem', 'Delivery lunch is greasy and costs €14', 2, 3), tkH('Test it with five cooks', 'feature', 'Counter', 'fri', 'JW'), cvH(0), bbH('Ayla', 'AD', '#ffd23f', 'can we test this with five cooks?'), cardH('idea', 'Home cooks sell tomorrow’s lunch', 1), cvH(2), evH('31 of 40 order in twice a week', 'data'), cardH('feature', 'Portion counter', 1), tkH('Ask which permit cooks need', 'customer', 'Home cooks', 'tue', 'AD'), bbH('Jonas', 'JW', '#ff3d9a', 'On it. Friday.'), cvH(3)];
+    const MORE = [cardH('problem', 'Cooks guess portions', 1, 2), evH('11 of 12 cooks signed up', 'data'), tkH('Two-week pilot', 'idea', 'Lunch', 'done', 'JW'), cardH('competitor', 'Wegbote', 0), bbH('Lena', 'LH', '#2de2e6', 'Nobody walks fifteen minutes.'), evH('The queue is gone by 12:30', 'observation'), cardH('customer', 'Home cooks', 1), tkH('Order cut-off to 9 pm', 'feature', 'Pre-order', 'thu', 'YO'), cardH('feature', 'Pickup shelf with a QR code', 0), bbH('Ayla', 'AD', '#ffd23f', 'Could pickup be in their lobby?'), evH('9 pm is when they plan', 'interview'), cardH('idea', 'A weekly plan', 0)];
+    const orbit = (() => {
+      const root = el2('hh', ''), title = el2('ht', 'North Star', root), it = PIECES.map((h) => el2('hi', h, root)), it2 = MORE.map((h) => el2('hi', h, root));
+      return { draw(t, V) {
+        set(root, 'display', V < 1 ? 'block' : 'none'); if (V >= 1) return;
+        it2.forEach((e, i) => { const n2 = it2.length, k = out(clamp(t / 2.2)), v2 = V * V, a = -(i / n2) * 6.2832 - t * 0.1 - (1 - k) * 3 - v2 * 1.6, ca = Math.cos(a), sa = Math.sin(a), R = (tall ? 620 : 1230) * (0.3 + 0.7 * k) * (1 + v2 * 1.5), y = -70 - sa * (tall ? 150 : 190) * 0.9 + ca * 60 + Math.sin(t * 0.5 + i * 1.3) * 12; set(e, 'transform', `translate(-50%,-50%) translate3d(${(ca * R).toFixed(1)}px,${(y - 60).toFixed(1)}px,${(sa * 760 * k - 420 + v2 * 500).toFixed(1)}px) rotateY(${(-ca * 50).toFixed(2)}deg) rotateZ(${(Math.sin(i * 2.3) * 9).toFixed(2)}deg) scale(${tall ? 0.26 : 0.4})`); set(e, 'opacity', (k * (0.4 + 0.6 * seg(sa, -0.9, 0.4)) * (1 - seg(V, 0.55, 0.95))).toFixed(3)); });
+        const inn = out(clamp(t / 2.2)), v = V * V, n = it.length;
+        set(title, 'transform', `translate(-50%,-50%) translate3d(0,-40px,${(v * 1100).toFixed(0)}px) scale(${tall ? 0.5 : 1})`); set(title, 'opacity', (clamp(t / 1.2) * (1 - seg(V, 0.35, 0.7))).toFixed(3));
+        it.forEach((e, i) => { const a = (i / n) * 6.2832 + t * 0.14 + (1 - inn) * 2.4 + v * 2, ca = Math.cos(a), sa = Math.sin(a), R = (tall ? 470 : 900) * (0.35 + 0.65 * inn) * (1 + v * 1.6), z = sa * 640 * (1 + v * 1.2) * inn, y = -40 + sa * (tall ? 190 : 225) + Math.sin(i * 2.1) * 46 + Math.sin(t * 0.6 + i) * 10;
+          set(e, 'transform', `translate(-50%,-50%) translate3d(${(ca * R).toFixed(1)}px,${y.toFixed(1)}px,${z.toFixed(1)}px) rotateY(${(-ca * 46).toFixed(2)}deg) rotateZ(${(Math.sin(i * 1.7) * 7).toFixed(2)}deg) scale(${tall ? 0.3 : 0.44})`);
+          set(e, 'opacity', (inn * (0.28 + 0.72 * seg(sa, -0.9, 0.3)) * (1 - seg(V, 0.55, 0.95))).toFixed(3)); });
+      } };
+    })();
+    // 10: the agent, all of it going in.
+    const ORB = A('orbc', '<canvas width="1240" height="1240"></canvas>', [[9.96, 0, 60, 0.02, 0, 0, 0, 0, -200], [10.04, 0, 0, 0.1, 0, 0, 0, 1], [10.5, 0, -120, 0.78, 0, 0, 0, 1, 0, out], [10.64, 0, -120, 0.8], [10.84, 440, 0, 0.78, 0, 0, 0, 1], [11.26, 440, 0, 0.78], [11.4, 440, -95, 0.62], [11.6, 440, -95, 0.62]]);
+    const words = ['11 of 12 cooks signed up', '“nobody walks fifteen minutes”', 'fees make €4.70 before food', 'Permit, Neukölln', 'c2 for c1', 'c3 solves c2', 'Interviews: offices', 'order cut-off, 9 pm', 'Wegbote has no pickup', 'a pickup shelf in each lobby?', 'validated', 'Lena, 14:02', '31 of 40', 'canteen queue gone by 12:30', 'Portion counter · P1', 'quick win', 'due friday', 'Where the €14 goes', 'private kitchens may sell if registered', 'Ayla: could it be in their lobby?', 'weekly plan, €39 or €45', 'two-week pilot', 'score 9.0', 'Stubenkoch: full', 'guess', 'documented', 'Home cooks', 'Jonas: friday', 'allergen list', 'Orders close at nine', 'cooks shop after work', 'part of c3', 'Factory, 3rd floor', 'f3 open', 'nobody covers it', '12 people, 3 offices', 'survey', '€14 or more', 'contradicts', 'Office workers'];
+    const FR = words.filter((_, i) => i % 3).map((w, i) => { const an = i * 2.399, r = 900 + (i % 5) * 160, a = 10.0 + (i % 13) * 0.026, x = Math.cos(an) * r * 1.25, y = Math.sin(an) * r * 0.75; return A('fr', w, [[a, x, y, 1.1, 0, 0, 0, 0, 500], [a + 0.1, x * 0.6, y * 0.6, 1, 0, x > 0 ? -24 : 24, Math.sin(an) * 8, 1, 260], [a + 0.27, x * 0.1, y * 0.1 - 70, 0.22, 0, 0, Math.sin(an) * 30, 0, 0]]); });
+    const ASK = A('ask', '<b>&gt;</b><span></span>', [[10.7, -300, 700, 0.9, 0, 20, -8, 1, 100], [10.84, -285, -60, 0.9, 0, 6, 0, 1, 0, out], [11.06, -285, -60, 0.9, 0, 6, 0], [11.16, -285, -130, 0.9, 0, 6, 0], [11.6, -285, -132, 0.9, 0, 6, 0]]);
+    const ANS = A('ans', '', [[11.04, -330, 150, 0.92, 0, 6, 0, 1], [11.6, -330, 146, 0.92, 0, 6, 0, 1]]);
+    const SRC = [['document · d1', '7 of 12: “I won’t walk”', 150, -255, 11.1], ['thread · tuesday', 'Ayla: what if it’s in their lobby?', 430, -318, 11.18], ['plan', 'Shelf: €2,100, week one', 610, -175, 11.26]].map(([k, t, x, y, a]) => A('src', `<small>${k}</small>${t}`, [[a, 470, 0, 0.1, 0, 0, 0, 0, 60], [a + 0.09, x, y, 0.92, 0, -10, x > 400 ? 4 : -5, 1, 160, back], [11.6, x, y - 14, 0.92, 0, -10, x > 400 ? 4 : -5, 1, 160]]));
+    const CHG = [['−', '#ff3d9a', 'Pickup shelf', 'P1 → P3'], ['+', '#2de2e6', 'Test: lobby pickup, two offices', '€180'], ['+', '#2de2e6', '3 tasks: Ayla, Jonas, Lena', 'mon to fri'], ['~', '#ffd23f', '“People will walk”', 'contradicted ×7']].map(([m, c, t, r], i) => { const a = A('chg', `<b style="color:${c}">${m}</b><span>${t}</span><em>${r}</em>`, [[11.3 + i * 0.03, 440, -40, 0.05, 0, 0, 160 - i * 80, 0, 0], [11.4 + i * 0.03, 400 + i * 9, 62 + i * 69, 0.7, 0, -8, 1.5, 1, 240, back], [11.6, 400 + i * 9, 62 + i * 69, 0.7, 0, -8, 1.5, 1, 240]]); a.m = a.e.firstChild; a.o = m; return a; });
+    const APP = A('app', '<span>apply</span><span>discard</span>', [[11.44, 410, 350, 0.4, 0, 0, 0, 0, 240], [11.48, 410, 345, 0.6, 0, 0, 0, 1, 240, back], [11.6, 410, 345, 0.6, 0, 0, 0, 1, 240]]);
+    // The end: the answer stays a while, then all of it lets go; the agent comes to the middle and is a star.
+    const leave = (a, d, to) => { const l = a.keys.at(-1).slice(0, 9); while (l.length < 9) l.push(l.length === 7 ? 1 : 0); a.keys.push([12.12 + d, ...l.slice(1)], [12.5 + d, ...to(l), (t) => t * t]); };
+    leave(ASK, 0, (l) => [l[1] - 500, l[2] - 500, 0.9, 20, 50, -14, 0, 60]); leave(ANS, 0.04, (l) => [l[1] - 700, l[2] + 200, 0.9, 10, 60, 6, 0, 60]);
+    SRC.forEach((a, i) => leave(a, 0.06 + i * 0.03, () => [430, -60, 0.1, 0, 0, 60 - i * 60, 0, 20])); CHG.forEach((a, i) => leave(a, 0.08 + i * 0.03, (l) => [l[1] + 900, l[2] + 300, 0.9, 0, -70, 20 + i * 8, 0, 60]));
+    ORB.keys.push([12.14, 440, -95, 0.62, 0, 0, 0, 1], [12.52, 0, -130, 0.7, 0, 0, 0, 1], [12.66, 0, -130, 0.72, 0, 0, 0, 1], [12.86, 0, -150, 0.015, 0, 0, 0, 1], [12.87, 0, -150, 0.01, 0, 0, 0, 0]);
+    if (tall) {
+      const H = Math.min(1, innerHeight / innerWidth * 820 / 1640), v = (y) => y * H;
+      ORB.keys = [...ORB.keys.filter((k) => k[0] < 10.8), [10.84, 0, v(-215), 0.4 * H, 0, 0, 0, 1], [12.14, 0, v(-215), 0.4 * H, 0, 0, 0, 1], [12.52, 0, -80, 0.6, 0, 0, 0, 1], [12.66, 0, -80, 0.62, 0, 0, 0, 1], [12.86, 0, -80, 0.015, 0, 0, 0, 1], [12.87, 0, -80, 0.01, 0, 0, 0, 0]];
+      ASK.keys = [[10.7, -300, 900, 0.8, 0, 20, -8, 1, 60], [10.84, 0, v(-455), 0.83, 0, 0, 0, 1, 0, out], [12.12, 0, v(-455), 0.83, 0, 0, 0], [12.5, -900, v(-600), 0.8, 0, 40, -14]];
+      ANS.keys = [[11.04, 0, v(190), 0.86 * Math.max(0.9, H), 0, 0, 0, 1], [12.16, 0, v(190), 0.86 * Math.max(0.9, H), 0, 0, 0, 1], [12.54, -1100, v(300), 0.8, 0, 50, 6]];
+      SRC.forEach((a, i) => { const [x, y] = [[-272, v(-305)], [272, v(-275)], [-268, v(-125)]][i]; a.keys = [[11.1 + i * 0.08, 0, v(-215), 0.1, 0, 0, 0, 0, 20], [11.19 + i * 0.08, x, y, 0.74, 0, 0, [-4, 4, 3][i], 1, 40, back], [12.18, x, y, 0.74, 0, 0, [-4, 4, 3][i], 1, 40], [12.5, 0, v(-160), 0.1, 0, 0, 60, 0, 20]]; });
+      CHG.forEach((a, i) => { const y = v(405 + i * 88); a.keys = [[11.3 + i * 0.03, 0, v(-215), 0.05, 0, 0, 120, 0, 20], [11.4 + i * 0.03, 0, y, 0.9 * Math.max(0.85, H), 0, 0, 0, 1, 40, back], [12.2, 0, y, 0.9 * Math.max(0.85, H), 0, 0, 0, 1, 40], [12.52, 1000, y, 0.8, 0, -60, 20, 1, 40]]; });
+      APP.keys = [[11.44, 0, v(752), 0.4, 0, 0, 0, 0, 40], [11.48, 0, v(752), 0.74, 0, 0, 0, 1, 40, back], [11.6, 0, v(752), 0.74, 0, 0, 0, 1, 40]];
+    }
+    const Q = 'three weeks, €3,000. what kills this first?';
+    const ANSP = [['The walk. ', 'span'], ['Three features rest on people picking up, and in ', 0], ['d1 Interviews', 's'], [' seven of twelve said they won’t walk. Ayla saw it on Tuesday, in a thread. ', 0], ['Nobody has tested it, and the shelf eats €2,100 of your budget.', 'span'], [' So I’d test lobbies first. It costs €180 and one week.', 0]], AL = ANSP.reduce((n, [t]) => n + t.length, 0);
+    const typeAns = (t) => { let n = Math.round(AL * t); if (ANS.n === n) return; ANS.n = n; ANS.e.innerHTML = ANSP.map(([s, f]) => { const k = s.slice(0, Math.max(0, n)); n -= s.length; return !k ? '' : f === 's' ? `<s><b>${k.slice(0, 2)}</b>${k.slice(3)}</s>` : f ? `<span>${k}</span>` : k; }).join(''); };
+
+    const orbX = $('canvas', ORB.e).getContext('2d'), OP = Array.from({ length: 1100 }, (_, i) => { const y = 1 - (2 * (i + 0.5)) / 1100, r = Math.sqrt(1 - y * y), a = i * Math.PI * (3 - Math.sqrt(5)); return [Math.cos(a) * r, y, Math.sin(a) * r]; });
+    const GLY = document.createElement('canvas'); GLY.width = 320; GLY.height = 160;
+    const glyphs = () => { const x = GLY.getContext('2d'); x.clearRect(0, 0, 320, 160); x.font = "700 33px 'JetBrains Mono'"; x.textAlign = 'center'; x.textBaseline = 'middle'; ['#f2f2f2', '#9a9a9a', '#4d4d4d', '#2de2e6'].forEach((c, r) => { x.fillStyle = c; [...' .·:-=+*'].forEach((g, i) => x.fillText(g, i * 40 + 20, r * 40 + 21)); }); };
+    const drawOrb = (t, P) => {
+      const x = orbX, S = 1240, R = 490, c = S / 2, eat = seg(P, 10.1, 10.2) * (1 - seg(P, 10.5, 10.6)), read = seg(P, 11.02, 11.08) * (1 - seg(P, 11.3, 11.36)), think = read, talk = seg(P, 11.08, 11.12) * (1 - seg(P, 11.36, 11.4)), glad = P > 11.53;
+      x.clearRect(0, 0, S, S); const a = t * (0.3 + think * 1.4), lx = P > 11.4 ? -0.04 : P > 11.06 ? -0.16 + 0.22 * seg(P, 11.1, 11.28) : P > 10.72 ? -0.2 : Math.sin(t * 1.1) * 0.2 * (0.4 + eat), ly = P > 11.4 ? 0.1 : P > 11.08 ? -0.14 : P > 10.72 ? 0 : Math.cos(t * 0.8) * 0.1 * eat, bl = t % 4.1 < 0.12 ? 0.12 : 1 - think * 0.45, pulse = 1 + eat * 0.02 * Math.sin(t * 5);
+      const eyes = [-1, 1].map((s) => ({ x: c + (s * 0.3 + lx) * R, y: c + ly * R - 24, rx: R * 0.125, ry: R * 0.215 }));
+      for (const [px, py, pz] of OP) {
+        const X = px * Math.cos(a) + pz * Math.sin(a), Z0 = -px * Math.sin(a) + pz * Math.cos(a), Y = py * Math.cos(0.38) - Z0 * Math.sin(0.38), Z = py * Math.sin(0.38) + Z0 * Math.cos(0.38), sx = c + X * R * pulse, sy = c - Y * R * pulse;
+        if (Z > 0 && eyes.some((e) => Math.hypot((sx - e.x) / (e.rx * 1.6), (sy - e.y) / (e.ry * 1.4)) < 1)) continue;
+        const rim = Math.hypot(X, Y), wv = Math.max(eat * Math.max(0, Math.sin(rim * 9 + t * 7)) ** 6, talk * Math.max(0, Math.sin(Math.hypot(X - lx, Y + ly) * 8 - t * 6)) ** 6);
+        const b = Z < 0 ? 0.14 + (Z + 1) * 0.14 : 0.3 + 0.7 * Math.max(0, X * -0.45 + Y * 0.5 + Z * 0.74);
+        x.drawImage(GLY, Math.min(7, Math.max(1, Math.round(b * 7))) * 40, ((think > 0.3 && Math.abs(Math.sin(Y * 3 - t * 5)) < 0.22) || (wv > 0.4 && Z > -0.3) ? 3 : Z < 0 ? 2 : b > 0.72 ? 0 : 1) * 40, 40, 40, sx - 20, sy - 20, 40, 40);
+      }
+      x.fillStyle = x.strokeStyle = '#fff'; x.lineCap = x.lineJoin = 'round';
+      for (const e of eyes) { if (glad) { x.lineWidth = R * 0.075; x.beginPath(); x.moveTo(e.x - e.rx * 1.05, e.y + e.ry * 0.35); x.lineTo(e.x, e.y - e.ry * 0.45); x.lineTo(e.x + e.rx * 1.05, e.y + e.ry * 0.35); x.stroke(); continue; } const h = e.ry * 2 * bl * (1 + eat * 0.12); x.beginPath(); x.roundRect(e.x - e.rx, e.y - h / 2, e.rx * 2, h, Math.min(e.rx, h / 2) * 0.64); x.fill(); }
+    };
+    const CAP = [[1.0, 1.95, "l"], [2.05, 2.95, "r"], [3.05, 3.95, "t"], [4.08, 5.45, "t"], [6.24, 6.88, "l"], [7.0, 7.9, "r"], [8.0, 8.9, "l"], [9.0, 9.9, "b"], [10.1, 11.06, "b"], [11.15, 12.07, "l"], [12.15, 13.049999999999999, "l"], [13.219999999999999, 13.719999999999999, "c"], [13.82, 15.28, "x"]], arts = [...document.querySelectorAll('.cap article')], hero = $('.hero'), mast = $('.mast'), bar = $('.bar');
+    const TOTAL = 16.05, warp = (r) => (r < 4.9 ? r : r < 5.4 ? 4.9 : r - 0.5), toP = (g) => (g < 3.92 ? g : g < 4.97 ? 3.92 : g < 6.4 ? p4(g) : g < 9.45 ? g - 1.45 : g < 10.6 ? 8 : g - 2.6);
+    // On a phone the eye goes to where the pieces are: [when, middle x, scale, how far up].
+    const FRAME = [[0, 0, 1, 0], [0.75, 380, 0.82], [1.95, 380, 0.82], [2.3, -310, 0.86], [2.92, -310, 0.86], [3.2, -430, 0.92], [3.36, -430, 0.92], [3.8, 430, 0.92], [3.95, 430, 0.92], [4.35, 0, 0.76], [5.5, 0, 0.76], [6.0, 330, 0.8], [6.88, 320, 0.8], [7.2, -285, 0.78], [7.87, -285, 0.78], [8.15, 350, 0.98], [8.9, 350, 0.98], [9.15, 60, 0.54], [9.9, 80, 0.54], [10.1, 0, 0.78], [11.05, 0, 0.78], [11.2, 250, 0.7], [11.72, 250, 0.7], [11.94, 330, 0.9], [12.12, 335, 1], [12.6, 385, 1.05], [13.0, 385, 1.05], [13.15, 0, 0.95], [13.74, 0, 0.95], [13.9, 0, 1, 0], [20, 0, 1, 0]];
+    const render = (RW) => {
+      const G = warp(RW), P = toP(G);
+      zoomP = mix(1, 0.46, io(seg(G, 3.95, 4.4))) ; 
+      if (tall) { let i = 0; while (i < FRAME.length - 2 && RW >= FRAME[i + 1][0]) i++; const p = FRAME[i], q = FRAME[i + 1], k = io(seg(RW, p[0], q[0])); fx = mix(p[1], q[1], k); fm = mix(p[2], q[2], k); fy = mix(p[3] ?? 0.12, q[3] ?? 0.12, k) * sh / u; }
+      zoomC = mix(1, 0.335, io(seg(G, 9.54, 10.15))) * mix(1, 0.94, seg(G, 10.15, 10.55));
+      actors.forEach((a) => place(a, a.r ? RW : a.g ? G - (a.zc ? 0.4 : 0) : P));
+      CUR.forEach((c, i) => { set(c.e, 'color', ['#ffd23f', '#ff3d9a', '#2de2e6'][i]); });
+      type(C1, seg(P, 1.28, 1.42)); type(C2, seg(P, 1.64, 1.88));
+      const hits = [2.55, 2.71, 2.87]; C2.sq.forEach((s, i) => cls(s, 'on', P >= hits[i])); status(C2, P >= hits[2] ? 2 : P >= hits[0] ? 1 : 0); status(C1, P >= 3 ? 2 : 0); status(C3, P >= 3.6 ? 1 : 0); ONE.sq.forEach((s) => cls(s, 'on', true));
+      const hit = hits.reduce((m, h) => Math.max(m, P > h ? 1 - seg(P, h, h + 0.08) : 0), 0); set(C2.e, 'outline', hit ? `${(hit * 14).toFixed(1)}px solid rgba(255,61,154,${(hit * 0.5).toFixed(2)})` : 'none');
+      B.forEach((b) => { const k = io(seg(P, b.p, b.p + 0.12)); set(b.e.firstChild, 'transform', `scaleX(${k.toFixed(3)})`); set(b.e.lastChild, 'opacity', seg(P, b.p + 0.08, b.p + 0.14).toFixed(2)); });
+      LN.forEach((b) => { set(b.e.firstChild, 'transform', `scaleX(${(io(seg(RW, b.p, b.p + 0.1)) * (1 - seg(RW, 5.34, 5.42))).toFixed(3)})`); set(b.e.lastChild, 'opacity', (seg(RW, b.p + 0.06, b.p + 0.1) * (1 - seg(RW, 5.32, 5.36))).toFixed(2)); });
+      ROWS.forEach((e, i) => { const l = p4(5.42 + i * 0.05), k = out(seg(P, l - 0.01, l + 0.1)), f = k * (1 - seg(P, l + 0.06, l + 0.2)); set(e, 'clipPath', `inset(0 ${((1 - k) * 100).toFixed(1)}% 0 0)`); set(e, 'opacity', k > 0.01 ? '1' : '0'); set(e, 'boxShadow', f > 0.01 ? `inset 0 0 0 60px color-mix(in srgb, var(--t) ${(f * 55).toFixed(0)}%, transparent)` : 'none'); });
+      TL.forEach(([e, o]) => { const k = out(seg(P, 5.16 + o * 0.035, 5.34 + o * 0.035)), up = OPENR.includes(e) ? io(seg(P, 5.66, 5.84)) : 0; set(e, 'transform', `translateZ(${(up * 130).toFixed(1)}px) rotateX(${((1 - k) * -100).toFixed(1)}deg)`); set(e, 'opacity', k > 0.02 ? '1' : '0'); set(e, 'boxShadow', up ? `0 0 ${(up * 60).toFixed(0)}px rgba(0,0,0,.9)` : 'none'); });
+      OPENR.forEach((e, i) => { if (i) cls(e, 'op', P > 5.72 + i * 0.03); });
+      RK.forEach((a) => { const now = P > 6.7 ? a.to : a.f; text(a.num, '0' + (now + 1)); cls(a.e, 'up', a.to === 0 && P > 6.58); });
+      cls(TKH.e, 'on', P > 7.64);
+      SL.forEach((a, i) => { const dim = seg(P, 8.5, 8.62); set(a.fa, 'opacity', ((1 - dim * 0.75) * (1 - seg(P, 8.62, 8.7))).toFixed(2)); set(a.tab, 'opacity', (1 - seg(P, 8.66, 8.76)).toFixed(2)); set(a.me, 'transform', `translateZ(${(2 + dim * 34).toFixed(0)}px) scale(${(1 + dim * 0.05).toFixed(3)})`); set(a.me, 'background', P > 8.46 + i * 0.022 ? '#2de2e6' : '#24464a'); set(a.me, 'color', P > 8.46 + i * 0.022 ? '#000' : '#fff'); set(a.me.firstChild, 'color', P > 8.46 + i * 0.022 ? '#000' : '#2de2e6'); const g = 1 - seg(P, 8.68, 8.8); set(a.e, 'background', `rgba(18,19,21,${g.toFixed(2)})`); set(a.e, 'borderColor', g < 1 ? `rgba(60,64,72,${g.toFixed(2)})` : ''); set(a.e, 'boxShadow', g < 1 ? 'none' : ''); });
+      text(ASK.e.lastChild, Q.slice(0, Math.round(Q.length * seg(P, 10.84, 11.02)))); cls(ASK.e, 'ty', P > 10.82 && P < 11.04);
+      typeAns(seg(P, 11.1, 11.36)); CHG.forEach((a, i) => { const on = P > 11.545 + i * 0.01; cls(a.e, 'ok', on); text(a.m, on ? '✓' : a.o); }); cls(APP.e, 'hit', P > 11.52 && P < 11.56); set(APP.e, 'display', P > 11.555 ? 'none' : 'flex');
+      arts.forEach((e, i) => { const [a, b, s] = CAP[i], k = out(seg(RW, a, a + 0.16)), g = seg(RW, b - 0.1, b), o = k * (1 - g) * (i === arts.length - 1 ? 1 : 1); const vy = s === 'l' || s === 'r'; set(e, 'opacity', o.toFixed(3)); set(e, 'visibility', o ? 'visible' : 'hidden'); set(e, 'transform', tall ? `translateY(${((1 - k) * 30).toFixed(1)}px)` : `translate(${s === 'l' || s === 'x' ? ((1 - k) * -70).toFixed(1) + 'px' : s === 'r' ? ((1 - k) * 70).toFixed(1) + 'px' : '-50%'},${vy ? `calc(-50% - ${(g * 60).toFixed(1)}px)` : ((1 - k) * 50 - g * 40).toFixed(1) + 'px'})`); });
+      const h = 1 - seg(P, 0.02, 0.2); set(hero, 'opacity', h.toFixed(3)); set(hero, 'visibility', h ? 'visible' : 'hidden'); cls(mast, 'past', P > 0.25);
+      set(bar, 'transform', `scaleX(${(RW / TOTAL).toFixed(4)})`);
+    };
+    const measure = () => { sw = stage.clientWidth; sh = stage.clientHeight; if (tall !== sw <= 820) { location.reload(); return; } u = tall ? sw / 820 : Math.min(sw / 1640, sh / 900); zm.style.zoom = u; };
+    let now = null, last = null, orbAt = 0, lit = false; const t00 = performance.now();
+    const tick = (ts) => {
+      requestAnimationFrame(tick);
+      if (!lit && now > 15.75) { lit = true; atemBackdrop($('canvas.field')); }
+      const goal = clamp(scrollY / (track.offsetHeight - sh)) * TOTAL; if (scrollY > track.offsetHeight) return;
+      now = now === null ? goal : Math.abs(goal - now) < 0.0005 ? goal : now + (goal - now) * 0.13;
+      const RW = now, G = warp(RW), P = toP(G), t = Math.max(0, (ts - t00) / 1000);
+      orbit.draw(t, seg(G, 0, 1)); if (P > 9.95 && P < 12.9 && ts - orbAt > 30) { orbAt = ts; drawOrb(t, P); }
+      if (last !== RW) { last = RW; render(RW); }
+    };
+    addEventListener('resize', () => { measure(); last = null; });
+    document.fonts.load("400 100px 'JetBrains Mono'").then(() => document.fonts.ready).then(() => { glyphs(); measure(); requestAnimationFrame(tick); });
+})();
+</script></body></html>
