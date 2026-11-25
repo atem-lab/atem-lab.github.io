@@ -9,16 +9,17 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/name.css">
-<link rel="stylesheet" href="/legal.css?v=3">
+<link rel="stylesheet" href="/legal.css?v=4">
 </head>
 <body>
-<div class="page">
-  <header><a class="name" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span></a><a class="back" href="/">← back</a></header>
-  <h1>Confirm your place</h1>
-  <p>Press the button to join the Orrery waitlist. I then write to you once, when Orrery is ready. You can leave the list at any time with the <a href="/contact.html?topic=privacy">contact form</a>.</p>
-  <form data-confirm><button type="submit">Join the waitlist</button><p data-note role="status"><a href="/privacy.html">Privacy</a></p></form>
-  <p class="foot"><a href="/impressum.html">Impressum</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a></p>
-</div>
+<header><a class="name" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span></a><nav aria-label="Legal"><a href="/impressum">Impressum</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></nav></header>
+<main>
+  <div class="intro"><a class="back" href="/">← back</a><h1>Confirm your place</h1></div>
+  <div class="text">
+  <p>Press the button to join the Orrery waitlist. I then write to you once, when Orrery is ready. You can leave the list at any time with the <a href="/contact?topic=privacy">contact form</a>.</p>
+  <form data-confirm><button type="submit">Join the waitlist</button><p data-note role="status"><a href="/privacy">Privacy</a></p></form>
+  </div>
+</main>
 <script>
   const local = location.hostname === '127.0.0.1' && new URLSearchParams(location.search).get('endpoint');
   const ENDPOINT = local || 'https://europe-west1-north-star-db.cloudfunctions.net/confirmWaitlist';
