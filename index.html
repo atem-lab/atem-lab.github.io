@@ -145,7 +145,8 @@
   .g, .g .well, .g .button, .g .note, .g .inner p { font-family: var(--mono); }
   .g .inner p { font-weight: 300; font-size: 15px; letter-spacing: 0.01em; }
   .g .well, .g .button { font-size: 13px; }
-  .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); text-transform: lowercase; color: #b81d40; filter: blur(clamp(3px, 0.4vw, 6px)); opacity: 0.9; }
+  /* The face sits low in its line: the foot padding makes the space under the letters the same as over them. */
+  .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); padding-bottom: 0.13em; text-transform: lowercase; color: #b81d40; filter: blur(clamp(3px, 0.4vw, 6px)); opacity: 0.9; }
   .g.open .title { color: #ff3358; filter: blur(0); opacity: 1; }
   /* Still being made: the row's bottom line a thin red light that runs from left to right, again and again, like
      something loading. */
