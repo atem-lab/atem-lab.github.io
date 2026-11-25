@@ -6,7 +6,8 @@
 <title>ATEM</title>
 <meta name="description" content="ATEM: North Star, and Orrery, the context layer for AI.">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<link rel="preload" href="/fonts/michroma.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
@@ -16,7 +17,9 @@
   @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
   /* Major Mono Display (SIL OFL 1.1, fonts/LICENSE-MajorMonoDisplay.txt): Orrery's name. */
   @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
-  /* Geist Mono (SIL OFL 1.1, fonts/LICENSE-GeistMono.txt): the name. */
+  /* Michroma (SIL OFL 1.1, fonts/LICENSE-Michroma.txt): the name. */
+  @font-face { font-family: 'Michroma'; src: url('/fonts/michroma.woff2') format('woff2'); font-display: swap; }
+  /* Geist Mono (SIL OFL 1.1, fonts/LICENSE-GeistMono.txt): the small labels around it. */
   @font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono.woff2') format('woff2'); font-weight: 500; font-display: swap; }
   :root {
     --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16);
@@ -34,18 +37,26 @@
      colour (North Star cyan, Orrery red) and opens its row. */
   .page { position: relative; z-index: 1; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; padding: 16px 24px 24px; }
   header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-  /* The name: atem and a slash. An open row writes its product after it, in that product's own face and colour; the
-     slash takes the colour and atem steps back. */
-  h1 { flex: none; margin: 0; display: flex; align-items: baseline; font: 500 clamp(24px, 2.37vw, 45px)/1 'Geist Mono', var(--mono); letter-spacing: -0.04em; color: var(--strong); white-space: nowrap; }
-  .lab { transition: color 120ms; }
+  /* The name is a prompt: atem and a block cursor. An open row types a slash and its product, in that product's own
+     face and colour; atem steps back. */
+  h1 { flex: none; margin: 0; display: flex; align-items: baseline; font: 500 clamp(24px, 2.37vw, 45px)/1 var(--mono); color: var(--strong); white-space: nowrap; }
+  /* Keeps the line's height and baseline while nothing is typed yet. */
+  .lab::before { content: ''; display: inline-block; }
+  .caret { position: relative; width: 0.6em; height: 0; margin-left: 0.06em; }
+  .caret::before { content: ''; position: absolute; left: 0; top: -0.86em; width: 0.54em; height: 1.04em; background: var(--tone, var(--strong)); animation: blink 1.1s infinite; }
+  h1[data-typing] .caret::before { animation: none; }
+  @keyframes blink { 0%, 54.9% { opacity: 1; } 55%, 100% { opacity: 0; } }
+  .lab { font: 400 0.82em/1.22 'Michroma', var(--sans); letter-spacing: -0.04em; transition: color 120ms; }
   .slash { position: relative; width: 0.56em; height: 0; }
   .slash::before { content: ''; position: absolute; left: calc(50% - 0.05em); top: -0.893em; width: 0.1em; height: 1.045em; background: var(--tone, var(--strong)); transform: rotate(16deg); transition: background-color 120ms; }
+  h1:not([data-of]) .slash { display: none; }
   h1[data-of] .lab { color: var(--dim); }
   h1[data-of=ns] { --tone: var(--cyan); }
   h1[data-of=g] { --tone: #ff3358; }
+  /* No line of their own (line height 0): the products' faces sit on atem's baseline and never move it. */
   .of { white-space: pre; color: var(--tone); }
-  h1[data-of=ns] .of { font: 400 1em/1 var(--mono); letter-spacing: -0.045em; }
-  h1[data-of=g] .of { font: 400 0.9em/1 'Major Mono Display', var(--mono); letter-spacing: 0; text-transform: lowercase; }
+  h1[data-of=ns] .of { font: 400 1em/0 var(--mono); letter-spacing: -0.045em; }
+  h1[data-of=g] .of { font: 400 0.9em/0 'Major Mono Display', var(--mono); letter-spacing: 0; text-transform: lowercase; }
   main { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
   /* The rows' contents sit a little in from the page's edge, on the same edge as the name ATEM's ink (measured below);
      their lines and the label run to the page's edge. */
@@ -55,7 +66,7 @@
     content: ''; position: absolute; inset: -96px -24px -24px; z-index: -1; pointer-events: none;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 55%, rgba(0, 0, 0, 0));
   }
-  .label { margin: 0 0 12px; font: 400 12px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+  .label { margin: 0 0 12px; font: 500 12px/1 'Geist Mono', var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
   .item { border-top: 1px dashed var(--line); --tone: var(--strong); }
   .item:last-child { border-bottom: 1px dashed var(--line); }
   .head {
@@ -66,12 +77,18 @@
     display: inline-block; font: 500 clamp(48px, 10vw, 168px)/0.92 var(--sans); letter-spacing: -0.045em; color: var(--strong);
     transition: color 500ms var(--ease-move), transform 600ms var(--ease-move), filter 700ms var(--ease-move), opacity 700ms var(--ease-move);
   }
-  .state { font: 400 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); display: inline-flex; align-items: center; gap: 8px; }
+  .state { font: 500 12px/1 'Geist Mono', var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); display: inline-flex; align-items: center; gap: 8px; }
   .lamp { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px currentColor; }
   .item[data-live] .state { color: var(--cyan); }
   .item[data-live] .lamp { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
   .item[data-soon] .state { color: var(--orrery); }
   .item.open .title { color: var(--tone); }
+  /* A row that is a link: all of it, details too, and an arrow at its end. */
+  .item.ns { position: relative; }
+  a.head { text-decoration: none; box-sizing: border-box; outline: none; }
+  a.head::after { content: ''; position: absolute; inset: 0; }
+  .go { align-self: center; width: clamp(28px, 5vw, 84px); height: auto; fill: none; stroke: var(--dim); stroke-width: 1.7; transform: translateX(-16%); transition: transform 600ms var(--ease-move), stroke 500ms var(--ease-move); }
+  .item.open .go { stroke: var(--tone); transform: none; }
   /* Each name is pulled left by its first letter's own side space (measured below), so its ink starts where the text
      under it starts. */
   .title { margin-left: calc(var(--pull, 0) * -1px); }
@@ -121,7 +138,7 @@
   .note a { color: inherit; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, 0.3); text-underline-offset: 3px; }
   .note a:hover, .legal a:hover { color: var(--strong); }
   /* The legal pages, quiet at the top right, across from the name. */
-  .legal { display: flex; gap: 16px; font: 400 12px/1 var(--mono); letter-spacing: 0.06em; color: var(--dim); }
+  .legal { display: flex; gap: 16px; font: 500 12px/1 'Geist Mono', var(--mono); letter-spacing: 0.06em; color: var(--dim); }
 
   /* Orrery: a thin mono for everything in its section (North Star keeps Inter, in its own only); its name in Major Mono
      Display, red, and out of focus until you come close, then sharp and bright. */
@@ -140,6 +157,9 @@
   }
   @keyframes loading { from { background-position: -60% 0; } to { background-position: 160% 0; } }
 
+  /* Nothing to point with: a tap goes straight to the product, so its line is there already. */
+  @media (hover: none) { .ns .more { grid-template-rows: 1fr; } }
+  @media (max-width: 360px) { h1 { font-size: 20px; } }
   @media (max-width: 760px) {
     header { gap: 8px; }
     /* One under the other: the name grows with a product's, and the links must not move for it. */
@@ -155,17 +175,16 @@
 <body>
 <canvas class="field" aria-hidden="true"></canvas>
 <div class="page">
-  <header><h1 aria-label="ATEM"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true"></span></h1><nav class="legal" aria-label="Legal"><a href="/impressum">Impressum</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></nav></header>
+  <header><h1 aria-label="ATEM"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span><span class="of" aria-hidden="true"></span><span class="caret" aria-hidden="true"></span></h1><script>document.querySelector('.lab').textContent = ''</script><nav class="legal" aria-label="Legal"><a href="/impressum">Impressum</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></nav></header>
 <main>
     <div class="rows">
       <p class="label">Our products</p>
       <section class="item ns" data-live data-tint="#2de2e6" style="--tone:var(--cyan)">
-        <button class="head" type="button" aria-expanded="false">
-          <span class="title">North Star</span>
-        </button>
+        <a class="head" href="/north-star/">
+          <span class="title">North Star</span><svg class="go" viewBox="0 0 32 24" aria-hidden="true"><path d="M1 12h29M20 2l10 10-10 10"/></svg>
+        </a>
         <div class="more"><div><div class="inner">
           <p>Work out a startup idea, together: customers, problems, rivals and features on one canvas you share.</p>
-          <a class="button" href="/north-star/" style="--accent:var(--cyan)">see North Star →</a>
         </div></div></div>
       </section>
       <section class="item g" data-soon data-tint="#e8264f" style="--tone:var(--orrery)">
@@ -204,7 +223,7 @@
   const fontOf = (el) => { const cs = getComputedStyle(el); return `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; };
   const align = () => {
     const h1 = document.querySelector('h1');
-    const edge = h1.getBoundingClientRect().left + inkLeft(fontOf(h1), h1.textContent[0]);
+    const edge = h1.getBoundingClientRect().left + inkLeft(fontOf(h1.querySelector('.lab')), 'a');
     const rowsLeft = document.querySelector('.rows').getBoundingClientRect().left;
     for (const t of document.querySelectorAll('.title')) {
       const item = t.closest('.item'), p = item.querySelector('.inner p');
@@ -214,27 +233,53 @@
       t.style.setProperty('--pull', (inkLeft(fontOf(t), first) - pInk).toFixed(1));
     }
   };
-  document.fonts.ready.then(align);
+  // The name is typed later, so its face isn't asked for yet: ask.
+  Promise.all([document.fonts.load(fontOf(document.querySelector('.lab')), 'a'), document.fonts.ready]).then(align);
 
   addEventListener('resize', align);
 
-  // The name after the slash: whole within 120 ms, whatever its length; gone at once.
+  // The name, typed: atem as the page opens, then a slash and the open row's product; letter by letter erased again.
+  // `lab` and `n` are how much is on screen of atem and of "/product"; every step goes one letter towards what is wanted.
   const name = (() => {
-    const h1 = document.querySelector('h1'), of = h1.querySelector('.of');
-    let now = null, run = 0;
-    return (item) => {
-      if (item === now) return;
-      now = item;
-      cancelAnimationFrame(run);
-      of.textContent = '';
-      if (!item) return h1.removeAttribute('data-of');
-      h1.dataset.of = item.classList.contains('ns') ? 'ns' : 'g';
-      const text = item.querySelector('.title').textContent, from = performance.now();
-      const step = (t) => {
-        of.textContent = text.slice(0, Math.max(1, Math.ceil(((t - from) / 120) * text.length)));
-        if (of.textContent.length < text.length) run = requestAnimationFrame(step);
-      };
-      run = requestAnimationFrame(step);
+    const h1 = document.querySelector('h1'), labEl = h1.querySelector('.lab'), of = h1.querySelector('.of');
+    const LAB = 'atem', START = 450, TYPE_LAB = 130, TYPE = 48, ERASE = 22, REST = 350;
+    let lab = 0, n = 0, shown = null, wanted = null, timer = 0;
+    const text = (item) => (item ? '/' + item.querySelector('.title').textContent : '');
+    const draw = () => {
+      labEl.textContent = LAB.slice(0, lab);
+      if (n) h1.dataset.of = shown.classList.contains('ns') ? 'ns' : 'g'; else h1.removeAttribute('data-of');
+      of.textContent = text(shown).slice(1, Math.max(1, n));
+    };
+    const step = () => {
+      timer = 0;
+      let wait = 0;
+      if (lab < LAB.length) { lab++; wait = TYPE_LAB; }
+      else if (shown !== wanted && n > 0) { n--; wait = ERASE; }
+      else {
+        shown = wanted;
+        if (n < text(shown).length) { n++; wait = TYPE; }
+      }
+      draw();
+      if (wait) { h1.dataset.typing = ''; timer = setTimeout(step, wait); }
+      else timer = setTimeout(() => { timer = 0; h1.removeAttribute('data-typing'); if (shown !== wanted) step(); }, REST);
+    };
+    const start = () => { clearTimeout(timer); step(); };
+    // Coming back is not opening: the name is simply there.
+    const entry = performance.getEntriesByType('navigation')[0];
+    if (entry && entry.type === 'back_forward') { lab = LAB.length; draw(); }
+    else timer = setTimeout(step, START);
+    return {
+      set(item) {
+        if (item === wanted) return;
+        wanted = item;
+        if (lab === LAB.length) start();
+      },
+      reset() {
+        clearTimeout(timer);
+        timer = 0; lab = LAB.length; n = 0; shown = wanted = null;
+        h1.removeAttribute('data-typing');
+        draw();
+      },
     };
   })();
 
@@ -246,17 +291,36 @@
     for (const it of items) {
       const on = it === item;
       it.classList.toggle('open', on);
-      it.querySelector('.head').setAttribute('aria-expanded', on);
+      const head = it.querySelector('button.head');
+      if (head) head.setAttribute('aria-expanded', on);
     }
-    name(item);
+    name.set(item);
     field.setTint(item ? item.dataset.tint : null, item ? 0.82 : 0);
   };
   for (const it of items) {
     it.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(it); });
-    it.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !it.contains(document.activeElement)) show(kept); });
-    it.querySelector('.head').addEventListener('click', () => { kept = kept === it ? null : it; show(kept); });
-    it.addEventListener('focusin', () => show(it));
+    it.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !it.querySelector(':focus-visible')) show(kept); });
+    const head = it.querySelector('button.head');
+    if (head) head.addEventListener('click', () => { kept = kept === it ? null : it; show(kept); });
+    it.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) show(it); });
   }
+  // The browser keeps this page as it was left and hands it back on "back", the followed row still open and focused.
+  // Leave it closed; on return the pointer may already be over a row, which says nothing until it moves.
+  const rest = () => {
+    if (document.activeElement) document.activeElement.blur();
+    kept = null;
+    show(null);
+    name.reset();
+  };
+  addEventListener('pagehide', rest);
+  addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    rest();
+    addEventListener('pointermove', (m) => {
+      const it = m.pointerType === 'mouse' && m.target.closest && m.target.closest('.item');
+      if (it) show(it);
+    }, { once: true });
+  });
 
   // The waitlist (D-429 in North Star's memory bank): the email goes to the joinWaitlist function, which keeps it in
   // Firestore. Local tries can point it elsewhere: 127.0.0.1/?endpoint=<url>.
