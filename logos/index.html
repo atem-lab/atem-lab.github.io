@@ -13,140 +13,39 @@
 <link rel="stylesheet" href="/name.css?v=4">
 <style>
   @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
-  @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
   @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
-  :root { --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16); --mono: 'JetBrains Mono', ui-monospace, monospace; --sans: 'Inter', system-ui, sans-serif; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: #000; color: var(--fg); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  html, body { margin: 0; background: #000; }
   canvas { display: block; }
-  header { display: flex; justify-content: space-between; align-items: flex-start; padding: 16px 24px 0; }
-  header nav { display: flex; gap: 18px; font: 500 12px/1 'Geist Mono', var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding-top: 8px; }
-  header nav a { color: var(--dim); text-decoration: none; }
-  header nav a:hover { color: var(--strong); }
-  main { max-width: 1240px; margin: 0 auto; padding: 96px 24px 96px; }
-  .label { margin: 0; font: 500 12px/1.4 'Geist Mono', var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
-  h1 { margin: 14px 0 18px; font: 500 clamp(48px, 8vw, 120px)/0.95 var(--sans); letter-spacing: -0.045em; color: var(--strong); }
-  .lede { max-width: 60ch; margin: 0 0 24px; color: var(--dim); font-size: 17px; }
-  .lede b { color: var(--fg); font-weight: 500; }
-  .rules { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 80px; padding: 0; list-style: none; }
-  .rules li { font: 500 12px/1 var(--mono); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; }
-
-  .product { border-top: 1px dashed var(--line); padding: 28px 0 72px; }
-  .product > header { padding: 0; margin-bottom: 28px; align-items: baseline; }
-  .product h2 { margin: 0; font: 500 clamp(32px, 4vw, 52px)/1 var(--sans); letter-spacing: -0.04em; color: var(--strong); }
-  .product[data-p=g] h2 { font: 400 clamp(30px, 3.6vw, 46px)/1 'Major Mono Display', var(--mono); letter-spacing: 0; text-transform: lowercase; color: #e8264f; }
-  .product[data-p=ns] h2 { font: 400 clamp(32px, 4vw, 52px)/1 var(--mono); letter-spacing: -0.045em; color: #2de2e6; }
-  .swatch { display: flex; gap: 8px; align-items: center; font: 500 12px/1 var(--mono); color: var(--dim); }
-  .swatch i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-
-  .variants { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-  .variant { border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
-  .variant .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-  .variant h3 { margin: 0; font: 500 19px/1.3 var(--sans); color: var(--strong); letter-spacing: -0.01em; }
-  .variant .tag { font: 500 11px/1.3 'Geist Mono', var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
-  .icons { display: flex; gap: 18px; align-items: flex-end; flex-wrap: wrap; }
-  .app { border-radius: 22.37%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16); }
-  .stage { min-height: 112px; display: flex; align-items: center; overflow: hidden; }
-  .sizes { display: flex; gap: 14px; align-items: flex-end; }
-  .sizes div { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 11px/1 'Geist Mono', var(--mono); color: var(--dim); }
-  .note { margin: 0; color: var(--dim); font-size: 14px; }
-  code { font: 400 0.92em var(--mono); color: var(--fg); }
-  canvas[data-k=fav] { border-radius: 22%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16); }
-
-  .files { border-top: 1px dashed var(--line); padding-top: 28px; }
-  .files h2 { margin: 0 0 18px; font: 500 clamp(32px, 4vw, 52px)/1 var(--sans); letter-spacing: -0.04em; color: var(--strong); }
-  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0 32px; }
-  .list a { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px dashed var(--line); color: var(--fg); text-decoration: none; font: 400 14px/1.4 var(--mono); }
-  .list a span { color: var(--dim); }
-  .list a:hover { color: var(--strong); }
-  @media (max-width: 860px) { .variants { grid-template-columns: 1fr; } }
+  header { padding: 16px 24px 0; }
+  h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  main { max-width: 1240px; margin: 0 auto; padding: 120px 24px 160px; display: flex; flex-direction: column; gap: 160px; }
+  .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 96px 48px; justify-items: center; align-items: center; }
+  @media (max-width: 860px) { .row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-<header><a class="name" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span></a><nav aria-label="Pages"><a href="/">Home</a><a href="/north-star/">North Star</a></nav></header>
+<header><a class="name" href="/" aria-label="ATEM, home"><span class="lab" aria-hidden="true">atem</span><span class="slash" aria-hidden="true"></span></a></header>
 <main>
-  <p class="label">Brand</p>
   <h1>Logos</h1>
-  <p class="lede">The mark is a terminal cursor: one cell, 1:2. Every product has two. <b>Solid</b>, in the product's colour, blinks. <b>Colour</b> is filled with the field from the home page, flows, and never blinks.</p>
-  <ul class="rules"><li>cell 1:2</li><li>solid blinks, 1.1 s</li><li>colour never blinks</li><li>favicon: solid, still</li><li>one colour per product</li></ul>
-
-  <section class="product" data-p="atem">
-    <header><h2>ATEM</h2><span class="swatch"><i style="background:#fff"></i>#ffffff · all of the field</span></header>
-    <div class="variants">
-      <div class="variant">
-        <div class="top"><h3>Solid</h3><span class="tag">blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="atem" data-v="solid" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="atem" data-v="solid" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="atem" data-v="solid" data-m="64"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="atem" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="atem" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="atem" data-s="16"></canvas>16</div></div>
-        <p class="note">The favicon: solid, still.</p>
-      </div>
-      <div class="variant">
-        <div class="top"><h3>Colour</h3><span class="tag">flows · never blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="atem" data-v="colour" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="atem" data-v="colour" data-still="1" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="atem" data-v="colour" data-m="64"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="atem" data-v="colour" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="atem" data-v="colour" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="atem" data-v="colour" data-s="16"></canvas>16</div></div>
-        <p class="note">Flowing on screens; one still frame (the small icon) for print, files and the link preview.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="product" data-p="ns">
-    <header><h2>north-star</h2><span class="swatch"><i style="background:#2de2e6"></i>#2de2e6 · shades of blue</span></header>
-    <div class="variants">
-      <div class="variant">
-        <div class="top"><h3>Solid</h3><span class="tag">blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="ns" data-v="solid" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="ns" data-v="solid" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="ns" data-v="solid" data-m="48"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="ns" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="ns" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="ns" data-s="16"></canvas>16</div></div>
-        <p class="note">North Star's own favicon.</p>
-      </div>
-      <div class="variant">
-        <div class="top"><h3>Colour</h3><span class="tag">flows · never blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="ns" data-v="colour" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="ns" data-v="colour" data-still="1" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="ns" data-v="colour" data-m="48"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="ns" data-v="colour" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="ns" data-v="colour" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="ns" data-v="colour" data-s="16"></canvas>16</div></div>
-        <p class="note">The same field, in shades of blue.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="product" data-p="g">
-    <header><h2>orrery</h2><span class="swatch"><i style="background:#e8264f"></i>#e8264f · shades of red</span></header>
-    <div class="variants">
-      <div class="variant">
-        <div class="top"><h3>Solid</h3><span class="tag">blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="g" data-v="solid" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="g" data-v="solid" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="g" data-v="solid" data-m="56"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="g" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="g" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="g" data-s="16"></canvas>16</div></div>
-        <p class="note">The site's one red, <code>--orrery</code>.</p>
-      </div>
-      <div class="variant">
-        <div class="top"><h3>Colour</h3><span class="tag">flows · never blinks</span></div>
-        <div class="icons"><canvas class="app" data-k="icon" data-p="g" data-v="colour" data-s="168"></canvas><canvas class="app" data-k="icon" data-p="g" data-v="colour" data-still="1" data-s="72"></canvas></div>
-        <div class="stage"><canvas data-k="word" data-p="g" data-v="colour" data-m="56"></canvas></div>
-        <div class="sizes"><div><canvas data-k="fav" data-p="g" data-v="colour" data-s="48"></canvas>48</div><div><canvas data-k="fav" data-p="g" data-v="colour" data-s="32"></canvas>32</div><div><canvas data-k="fav" data-p="g" data-v="colour" data-s="16"></canvas>16</div></div>
-        <p class="note">The same field, in shades of red.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="files">
-    <p class="label">Files</p>
-    <h2>On the site</h2>
-    <div class="list">
-      <a href="/favicon.svg" download>favicon.svg <span>16 grid</span></a>
-      <a href="/favicon.ico" download>favicon.ico <span>16 · 32 · 48</span></a>
-      <a href="/apple-touch-icon.png" download>apple-touch-icon.png <span>180</span></a>
-      <a href="/icon-192.png" download>icon-192.png <span>192</span></a>
-      <a href="/icon-512.png" download>icon-512.png <span>512</span></a>
-      <a href="/icon-maskable-512.png" download>icon-maskable-512.png <span>512</span></a>
-      <a href="/og.png" download>og.png <span>1200 × 630</span></a>
-      <a href="/north-star/favicon.svg" download>north-star/favicon.svg <span>16 grid</span></a>
-      <a href="/north-star/favicon.ico" download>north-star/favicon.ico <span>16 · 32 · 48</span></a>
-      <a href="/north-star/apple-touch-icon.png" download>north-star/apple-touch-icon.png <span>180</span></a>
-      <a href="/north-star/og.png" download>north-star/og.png <span>1200 × 630</span></a>
-    </div>
-  </section>
+  <div class="row">
+    <canvas data-k="icon" data-p="atem" data-v="solid" data-s="220"></canvas>
+    <canvas data-k="icon" data-p="atem" data-v="colour" data-s="220"></canvas>
+    <canvas data-k="word" data-p="atem" data-v="solid" data-m="72"></canvas>
+    <canvas data-k="word" data-p="atem" data-v="colour" data-m="72"></canvas>
+  </div>
+  <div class="row">
+    <canvas data-k="icon" data-p="ns" data-v="solid" data-s="220"></canvas>
+    <canvas data-k="icon" data-p="ns" data-v="colour" data-s="220"></canvas>
+    <canvas data-k="word" data-p="ns" data-v="solid" data-m="48"></canvas>
+    <canvas data-k="word" data-p="ns" data-v="colour" data-m="48"></canvas>
+  </div>
+  <div class="row">
+    <canvas data-k="icon" data-p="g" data-v="solid" data-s="220"></canvas>
+    <canvas data-k="icon" data-p="g" data-v="colour" data-s="220"></canvas>
+    <canvas data-k="word" data-p="g" data-v="solid" data-m="56"></canvas>
+    <canvas data-k="word" data-p="g" data-v="colour" data-m="56"></canvas>
+  </div>
 </main>
 <script src="/mark.js"></script>
 <script>
