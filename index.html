@@ -18,20 +18,20 @@
 <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="preload" href="/fonts/michroma.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/kit/fonts/michroma.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/kit/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/kit/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/kit/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* JetBrains Mono and Inter (SIL OFL 1.1, fonts/LICENSE-*.txt), self-hosted, North Star's two faces. */
-  @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
-  @font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+  /* JetBrains Mono and Inter (SIL OFL 1.1, kit/fonts/LICENSE-*.txt), self-hosted, North Star's two faces. */
+  @font-face { font-family: 'JetBrains Mono'; src: url('/kit/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('/kit/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
   /* Major Mono Display (SIL OFL 1.1, fonts/LICENSE-MajorMonoDisplay.txt): Orrery's name. */
-  @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
+  @font-face { font-family: 'Major Mono Display'; src: url('/kit/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
   /* Michroma (SIL OFL 1.1, fonts/LICENSE-Michroma.txt): the name. */
-  @font-face { font-family: 'Michroma'; src: url('/fonts/michroma.woff2') format('woff2'); font-display: swap; }
+  @font-face { font-family: 'Michroma'; src: url('/kit/fonts/michroma.woff2') format('woff2'); font-display: swap; }
   /* Geist Mono (SIL OFL 1.1, fonts/LICENSE-GeistMono.txt): the small labels around it. */
-  @font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Geist Mono'; src: url('/kit/fonts/geist-mono.woff2') format('woff2'); font-weight: 500; font-display: swap; }
   :root {
     --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16);
     --cyan: #2de2e6; --magenta: #ff3d9a; --orrery: #e8264f;
@@ -218,8 +218,8 @@
     </div>
   </main>
 </div>
-<script src="/backdrop.js"></script>
-<script>
+<script type="module">
+  import { backdrop as atemBackdrop } from '/kit/src/backdrop.js?v=0.1.1';
   const field = atemBackdrop(document.querySelector('canvas.field'));
 
   // Every first letter has its own side space. Draw the first letters on a canvas and find where their ink really starts:

@@ -10,10 +10,11 @@
 <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="stylesheet" href="/name.css?v=4">
+<link rel="stylesheet" href="/kit/src/fonts.css?v=0.1.1">
+<link rel="stylesheet" href="/kit/src/name.css?v=0.1.1">
 <style>
-  @font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
-  @font-face { font-family: 'Major Mono Display'; src: url('/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('/kit/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
+  @font-face { font-family: 'Major Mono Display'; src: url('/kit/fonts/major-mono-display.woff2') format('woff2'); font-display: swap; }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #000; color: #fff; }
   canvas { display: block; }
@@ -47,10 +48,10 @@
     <canvas data-k="word" data-p="g" data-v="colour" data-m="56"></canvas>
   </div>
 </main>
-<script src="/mark.js"></script>
-<script>
-(() => {
-  const M = window.atemMark, dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+<script type="module">
+import * as M from '/kit/src/mark.js?v=0.1.1';
+{
+  const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
   const els = [...document.querySelectorAll('canvas[data-k]')].map((el) => ({ el, ctx: el.getContext('2d'), d: el.dataset, key: '' }));
   function size(o) {
     const d = o.d;
@@ -66,7 +67,7 @@
   function draw(o, t) {
     const d = o.d, colour = d.v === 'colour', still = !!d.still;
     const on = colour ? true : (d.k === 'fav' ? true : M.blinkOn(t));
-    const key = on + '|' + (colour && !still ? M.tick : 0);
+    const key = on + '|' + (colour && !still ? M.tick() : 0);
     if (key === o.key) return; o.key = key;
     if (d.k === 'word') {
       o.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); o.ctx.clearRect(0, 0, o.el.width, o.el.height);
@@ -78,7 +79,7 @@
   function loop(t) { M.step(); for (const o of els) draw(o, t); requestAnimationFrame(loop); }
   const fonts = ['400 20px Michroma', '400 20px "JetBrains Mono"', '400 20px "Major Mono Display"'].map((f) => document.fonts.load(f));
   Promise.all(fonts).finally(() => { els.forEach(size); requestAnimationFrame(loop); });
-})();
+}
 </script>
 </body>
 </html>

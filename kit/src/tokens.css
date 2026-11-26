@@ -1,0 +1,21 @@
+/* ATEM's shared tokens. tokens.js says the same in JS: change both together. */
+:root {
+  --atem-black: #000000;
+  --atem-white: #ffffff;
+  --atem-fg: #e6e6e6;
+  --atem-dim: #8a8a8a;
+  --atem-line: rgba(255, 255, 255, 0.16);
+  --atem-cyan: #2de2e6;
+  --atem-blue: #3d7bff;
+  --atem-magenta: #ff3d9a;
+  --atem-yellow: #ffd23f;
+  --atem-green: #3dff8a;
+  --atem-orrery: #e8264f;
+  --atem-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --atem-ease-move: cubic-bezier(0.33, 1, 0.68, 1);
+  --atem-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --atem-sans: 'Inter', system-ui, sans-serif;
+  --atem-name: 'Michroma', sans-serif;
+}
+/* The cursor's blink: on for 55 % of 1.1 s. */
+@keyframes atem-blink { 0%, 54.9% { opacity: 1; } 55%, 100% { opacity: 0; } }

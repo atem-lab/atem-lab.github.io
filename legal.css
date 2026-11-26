@@ -1,7 +1,7 @@
 /* Impressum, privacy, terms, contact, the waitlist's confirmation and the 404: the home page's faces and colours. The
    title large at the left (it stays while the text scrolls), what there is to read or fill in at the right. */
-@font-face { font-family: 'JetBrains Mono'; src: url('/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'JetBrains Mono'; src: url('/kit/fonts/jetbrains-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/kit/fonts/inter.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
 :root {
   color-scheme: dark;
   --fg: #e6e6e6; --dim: #8a8a8a; --strong: #fff; --line: rgba(255, 255, 255, 0.16); --magenta: #ff3d9a; --cyan: #2de2e6; --green: #3dff8a;
