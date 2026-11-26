@@ -68,9 +68,10 @@ html:not(.js) .track{height:auto}html:not(.js) .stage{position:static;height:aut
       while (i < K.length - 2 && P >= K[i + 1][0]) i++;
       const p = K[i], q = K[i + 1], raw = seg(P, p[0], q[0]), t = (q[9] || io)(raw), v = (k, d) => mix(p[k] ?? d, q[k] ?? d, t);
       let x = v(1, 0), y = v(2, 0), s = v(3, 1); if (a.zp) { x *= zoomP; y = 60 + (y - 60) * zoomP + 150 * (1 - zoomP); s *= zoomP; } if (a.zc) { x *= zoomC; y = y * zoomC - 165 * (1 - zoomC); s *= zoomC; } if (tall) { x = (x - fx) * fm; y = y * fm - fy; s *= fm; }
+      let z = v(8, 0); if (a.deep) { const k = (1900 - z + a.deep) / (1900 - z); x *= k; y *= k; s *= k; z -= a.deep; }
       const o = v(7, 1);
       set(a.e, 'visibility', o > 0.003 ? 'visible' : 'hidden'); set(a.e, 'opacity', o >= 1 ? '' : o.toFixed(3));
-      set(a.e, 'transform', `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${v(8, 0).toFixed(1)}px) rotateY(${v(5, 0).toFixed(2)}deg) rotateX(${v(4, 0).toFixed(2)}deg) rotateZ(${v(6, 0).toFixed(2)}deg) scale(${s.toFixed(4)})`);
+      set(a.e, 'transform', `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${z.toFixed(1)}px) rotateY(${v(5, 0).toFixed(2)}deg) rotateX(${v(4, 0).toFixed(2)}deg) rotateZ(${v(6, 0).toFixed(2)}deg) scale(${s.toFixed(4)})`);
     };
     const TONE = { customer: '#3dff8a', problem: '#ff3d9a', idea: '#ededed', feature: '#2de2e6', competitor: '#ffd23f' }, W = ['hypothesis', 'testing', 'validated'];
     const card = (k, t, keys, sq = 0) => { const a = A('card', `<div class="tp"><span class="pill">${k}</span><span class="st" data-l="0"><i></i><u style="text-decoration:none">hypothesis</u></span></div><h3></h3><div class="ft">${'<span class="sq"></span>'.repeat(sq)}</div>`, keys); a.e.style.setProperty('--t', TONE[k]); a.h = $('h3', a.e); a.st = $('.st', a.e); a.sq = [...a.e.querySelectorAll('.sq')]; a.t = t; text(a.h, t); return a; };
@@ -135,6 +136,8 @@ html:not(.js) .track{height:auto}html:not(.js) .stage{position:static;height:aut
     const G_ = (a) => (a.g = true, a), ZP = (a) => (a.zp = true, a), ZC = (a) => (a.zc = true, a);
     [C1, C2, C3, ...B].forEach(ZP);
     const PLN = ZP(G_(A('pn pln', tab('plane', '01', 'Lunch'), [[3.95, 0, 60, 1, 0, 0, 0, 0, -6], [4.16, 0, 60, 1, 0, 0, 0, 1, -6], [5.34, 0, 60, 1, 0, 0, 0, 1, -6], [5.56, -900, 60, 0.94, 6, 34, -2, 1, -160], [5.86, -4600, 200, 0.9, 10, 74, -10, 1, -300, (t) => t * t]]))); PLN.e.style.setProperty('--k', '#ededed');
+    // Kept far behind, drawn as large as it would look up front: what flies in over it can never cut through it.
+    PLN.deep = 400;
     [['customer', 'Offices without a canteen', -620, -330, -1400, -900, 0.7], ['problem', 'Fees eat €4.70 an order', -160, -330, 200, -1400, 0.48], ['idea', 'A pickup shelf in each lobby', 800, -330, 1700, -700, 0.7], ['feature', 'Pre-order by 9 pm', -700, 490, -1600, 1200, 0.62], ['feature', 'Pickup shelf with a QR code', -240, 490, -200, 1500, 0.62], ['feature', 'Portion counter', 220, 490, 1500, 1200, 0.62]].forEach(([k, t, x, y, fx, fy, sc], i) => { XC[i] = ZP(G_(card(k, t, [[4.22 + i * 0.05, fx * 1.6, fy * 1.6, 1, 40, -40, 40 - i * 16, 1, 500], [4.46 + i * 0.05, x, y, sc, 0, 0, 0, 1, 0, out], [4.97, x, y, sc]]))); });
     const RZ = (a) => (a.zp = true, a.r = true, a);
     // Parts of a problem, a part of a feature, a package round the ones that ship together, and the links that say so.
