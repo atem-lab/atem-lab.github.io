@@ -6,7 +6,18 @@
 <title>ATEM</title>
 <meta name="description" content="ATEM: North Star, and Orrery, the context layer for AI.">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<meta property="og:title" content="ATEM">
+<meta property="og:description" content="North Star, and Orrery, the context layer for AI.">
+<meta property="og:url" content="https://atem-lab.com/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://atem-lab.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico?v=3" sizes="32x32">
+<link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="/fonts/michroma.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
@@ -43,7 +54,7 @@
   /* Keeps the line's height and baseline while nothing is typed yet. */
   .lab::before { content: ''; display: inline-block; }
   .caret { position: relative; width: 0.6em; height: 0; margin-left: 0.06em; }
-  .caret::before { content: ''; position: absolute; left: 0; top: -0.86em; width: 0.54em; height: 1.04em; background: var(--tone, var(--strong)); animation: blink 1.1s infinite; }
+  .caret::before { content: ''; position: absolute; left: 0; top: -0.86em; width: 0.52em; height: 1.04em; background: var(--tone, var(--strong)); animation: blink 1.1s infinite; }
   h1[data-typing] .caret::before { animation: none; }
   @keyframes blink { 0%, 54.9% { opacity: 1; } 55%, 100% { opacity: 0; } }
   .lab { font: 400 0.82em/1.22 'Michroma', var(--sans); letter-spacing: -0.04em; transition: color 120ms; }
@@ -52,7 +63,7 @@
   h1:not([data-of]) .slash { display: none; }
   h1[data-of] .lab { color: var(--dim); }
   h1[data-of=ns] { --tone: var(--cyan); }
-  h1[data-of=g] { --tone: #ff3358; }
+  h1[data-of=g] { --tone: var(--orrery); }
   /* No line of their own (line height 0): the products' faces sit on atem's baseline and never move it. */
   .of { white-space: pre; color: var(--tone); }
   h1[data-of=ns] .of { font: 400 1em/0 var(--mono); letter-spacing: -0.045em; }
@@ -146,14 +157,14 @@
   .g .inner p { font-weight: 300; font-size: 15px; letter-spacing: 0.01em; }
   .g .well, .g .button { font-size: 13px; }
   /* The face sits low in its line: the foot padding makes the space under the letters the same as over them. */
-  .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); padding-bottom: 0.13em; text-transform: lowercase; color: #b81d40; filter: blur(clamp(3px, 0.4vw, 6px)); opacity: 0.9; }
-  .g.open .title { color: #ff3358; filter: blur(0); opacity: 1; }
+  .g .title { font: 400 clamp(44px, 9vw, 150px)/0.95 'Major Mono Display', var(--mono); padding-bottom: 0.13em; text-transform: lowercase; color: var(--orrery); filter: blur(clamp(3px, 0.4vw, 6px)); opacity: 0.9; }
+  .g.open .title { color: var(--orrery); filter: blur(0); opacity: 1; }
   /* Still being made: the row's bottom line a thin red light that runs from left to right, again and again, like
      something loading. */
   .item.g { position: relative; }
   .item.g::after {
     content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none;
-    background: linear-gradient(90deg, transparent, #ff3358 40%, #ff3358 60%, transparent) no-repeat;
+    background: linear-gradient(90deg, transparent, var(--orrery) 40%, var(--orrery) 60%, transparent) no-repeat;
     background-size: 40% 100%; animation: loading 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   }
   @keyframes loading { from { background-position: -60% 0; } to { background-position: 160% 0; } }
